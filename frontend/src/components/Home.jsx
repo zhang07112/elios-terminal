@@ -47,7 +47,7 @@ export default function Home({ onOpen }) {
     const t = setInterval(update, 10000)
     const t2 = setInterval(() => {
       try {
-        document.getElementById('statusTime').textContent =
+        document.getElementById('status-bar-time').textContent =
           new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })
       } catch {}
     }, 1000)
