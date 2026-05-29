@@ -50,7 +50,6 @@ export default function Chat({ api, onBack }) {
     const t = el.textContent.trim()
     if (!t || loading) return
     el.textContent = ''
-    el.dataset.hasContent = ''
     setMsgs(p => [...p, { role: 'user', content: t, id: Date.now(), time: Date.now() }])
     setLoading(true)
     try {
@@ -107,7 +106,7 @@ export default function Chat({ api, onBack }) {
     <div id="chat-interface-screen" className={selectionMode ? 'selection-mode' : ''}>
       <div className="header">
         <button className="back-btn" onClick={onBack} aria-label="返回" />
-        <div className="chat-header-avatar" />
+        <div className="chat-header-avatar">E</div>
         <div id="chat-header-center">
           <div id="chat-header-title">Elios</div>
           <div id="chat-header-status">在线</div>
@@ -144,11 +143,10 @@ export default function Chat({ api, onBack }) {
               }}
               onClick={() => selectionMode && toggleSelect(m.id)}
             >
-              {m.role === 'assistant' && <div className="avatar" />}
+              {m.role === 'assistant' && <div className="avatar">E</div>}
               <div className={`message-bubble ${m.role === 'assistant' ? 'ai' : 'user'}`}>
                 <div className="content">{m.content}</div>
               </div>
-              {m.role === 'user' && <div className="avatar" />}
               {showTs && <div className="timestamp">{formatTime(m.time)}</div>}
             </div>
           )
@@ -159,14 +157,6 @@ export default function Chat({ api, onBack }) {
 
       <div id="chat-input-area">
         <div id="chat-input-main-row">
-          <div id="chat-input-actions-top">
-            <button className="chat-action-icon-btn">照片</button>
-            <button className="chat-action-icon-btn">相机</button>
-            <button className="chat-action-icon-btn">位置</button>
-            <button className="chat-action-icon-btn">转账</button>
-            <button className="chat-action-icon-btn">红包</button>
-            <button className="chat-action-icon-btn">语音</button>
-          </div>
           <div
             id="chat-input"
             ref={inputRef}
@@ -176,9 +166,6 @@ export default function Chat({ api, onBack }) {
             onKeyDown={handleKeyDown}
             suppressContentEditableWarning
           />
-          <button id="wait-reply-btn" aria-label="等待回复">
-            <img src="https://img.heliar.top/file/1767692527831_retouch_2026010617394876.png" alt="" />
-          </button>
           <button id="send-btn" onClick={send} aria-label="发送" />
         </div>
       </div>
