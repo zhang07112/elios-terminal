@@ -1,0 +1,349 @@
+@font-face {
+  font-family: SanFranciscoDisplay-Regular;
+  src: url("https://cdn.rawgit.com/AppleDesignResources/SanFranciscoFont/master/SanFranciscoDisplay-Regular.otf") format("opentype");
+}
+body {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  margin: 0;
+}
+p {
+  margin: 0;
+}
+.wrapper {
+  position: relative;
+  width: 750px;
+  height: 1334px;
+  overflow: hidden;
+  font-family: "SanFranciscoDisplay-Regular", "Helvetica Neue", sans-serif;
+}
+.wrapper::before {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 1142px;
+  background-image: url(../images/wallpaper.jpg);
+  background-size: 750px 1334px;
+  z-index: -1;
+}
+.wrapper * {
+  box-sizing: border-box;
+}
+section.top-bar {
+  height: 40px;
+  padding: 5px 10px;
+}
+section.top-bar .signal {
+  float: left;
+  padding: 6px 2px;
+}
+section.top-bar .signal .circle {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid white;
+}
+section.top-bar .signal .circle.empty {
+  background-color: transparent;
+}
+section.top-bar .wifi {
+  float: left;
+  width: 36px;
+  height: 100%;
+  margin-left: 2px;
+}
+section.top-bar .wifi .circle {
+  display: inline-block;
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top: 3px solid white;
+}
+section.top-bar .wifi .circle:nth-child(1) {
+  margin-top: 6px;
+  width: 36px;
+  height: 36px;
+}
+section.top-bar .wifi .circle:nth-child(2) {
+  margin-top: 12px;
+  margin-left: 6px;
+  width: 24px;
+  height: 24px;
+}
+section.top-bar .wifi .circle:nth-child(3) {
+  margin-top: 18px;
+  margin-left: 12px;
+  width: 12px;
+  height: 12px;
+  border: 6px solid transparent;
+  border-top: 6px solid white;
+}
+section.top-bar .wifi .circle:nth-child(3)::after {
+  clear: both;
+}
+section.top-bar .time {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  font-size: 1.5rem;
+  color: white;
+  text-align: center;
+}
+section.top-bar .battery-percent {
+  float: right;
+  margin-right: 5px;
+  font-size: 1.6rem;
+  color: white;
+}
+section.top-bar .battery {
+  float: right;
+  width: 51px;
+  height: 100%;
+}
+section.top-bar .battery .rect {
+  display: block;
+  width: 41px;
+  height: 15px;
+  margin-top: 8px;
+  margin-left: 3px;
+  border-radius: 1px;
+  background-color: white;
+}
+section.top-bar .battery .rect::before,
+section.top-bar .battery .rect::after {
+  content: '';
+  display: block;
+  position: absolute;
+}
+section.top-bar .battery .rect::before {
+  width: 43px;
+  height: 17px;
+  margin-top: -2px;
+  margin-left: -2px;
+  border-radius: 3px;
+  border: 1px solid white;
+}
+section.top-bar .battery .rect::after {
+  width: 3px;
+  height: 7px;
+  margin-top: 4px;
+  margin-left: 44px;
+  border-radius: 0 12px 12px 0;
+  background-color: white;
+}
+section.icon-wrapper {
+  height: 1060px;
+  overflow: hidden;
+}
+section.icon-wrapper .page {
+  width: 750px;
+  height: 100%;
+  padding: 16px 54px;
+  float: left;
+}
+.icon {
+  position: relative;
+  float: left;
+  width: 120px;
+  height: 160px;
+  margin-right: 54px;
+  margin-bottom: 16px;
+}
+.icon:nth-child(4n) {
+  margin-right: 0;
+}
+.icon p {
+  width: 160px;
+  margin-top: 9px;
+  margin-left: -20px;
+  font-size: 1.5rem;
+  color: white;
+  letter-spacing: .0625rem;
+  text-align: center;
+  text-transform: capitalize;
+}
+.icon p.no-capitalize {
+  text-transform: none;
+}
+.icon div[class^="icon-"] {
+  width: 120px;
+  height: 120px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.icon div[class^="icon-"]:active {
+  filter: brightness(0.6);
+}
+.icon .icon-messages {
+  background-image: url(../images/icon/Messages.svg);
+}
+.icon .icon-calendar {
+  background-image: url(../images/icon/Calendar.svg);
+}
+.icon .icon-photos {
+  background-image: url(../images/icon/Photos.svg);
+}
+.icon .icon-camera {
+  background-image: url(../images/icon/Camera.svg);
+}
+.icon .icon-notes {
+  background-image: url(../images/icon/Notes.svg);
+}
+.icon .icon-maps {
+  background-image: url(../images/icon/Maps.svg);
+}
+.icon .icon-weather {
+  background-image: url(../images/icon/Weather.svg);
+}
+.icon .icon-videos {
+  background-image: url(../images/icon/Videos.svg);
+}
+.icon .icon-clock {
+  background-image: url(../images/icon/Clock.svg);
+}
+.icon .icon-news {
+  background-image: url(../images/icon/News.svg);
+}
+.icon .icon-wallet {
+  background-image: url(../images/icon/Wallet.svg);
+}
+.icon .icon-reminders {
+  background-image: url(../images/icon/Reminders.svg);
+}
+.icon .icon-stocks {
+  background-image: url(../images/icon/Stocks.svg);
+}
+.icon .icon-ibooks {
+  background-image: url(../images/icon/iBooks.svg);
+}
+.icon .icon-itunes-store {
+  background-image: url(../images/icon/iTunesStore.svg);
+}
+.icon .icon-app-store {
+  background-image: url(../images/icon/AppStore.svg);
+}
+.icon .icon-home {
+  background-image: url(../images/icon/Home.svg);
+}
+.icon .icon-health {
+  background-image: url(../images/icon/Health.svg);
+}
+.icon .icon-settings {
+  background-image: url(../images/icon/Settings.svg);
+}
+.icon .icon-phone {
+  background-image: url(../images/icon/Phone.svg);
+}
+.icon .icon-safari {
+  background-image: url(../images/icon/Safari.svg);
+}
+.icon .icon-mail {
+  background-image: url(../images/icon/Mail.svg);
+}
+.icon .icon-music {
+  background-image: url(../images/icon/Music.svg);
+}
+.icon .icon-calculator {
+  background-image: url(../images/icon/Calculator.svg);
+}
+.icon .icon-watch {
+  background-image: url(../images/icon/Watch.svg);
+}
+.icon .icon-contacts {
+  background-image: url(../images/icon/Contacts.svg);
+}
+.icon .icon-compass {
+  background-image: url(../images/icon/Compass.svg);
+}
+.icon .icon-facetime {
+  background-image: url(../images/icon/FaceTime.svg);
+}
+.icon .icon-find-my-friends {
+  background-image: url(../images/icon/FindMyFriends.svg);
+}
+.icon .icon-find-my-iphone {
+  background-image: url(../images/icon/FindMyiPhone.svg);
+}
+.icon .icon-garageband {
+  background-image: url(../images/icon/GarageBand.svg);
+}
+.icon .icon-imovie {
+  background-image: url(../images/icon/iMovie.svg);
+}
+.icon .icon-pages {
+  background-image: url(../images/icon/Pages.svg);
+}
+.icon .icon-numbers {
+  background-image: url(../images/icon/Numbers.svg);
+}
+.icon .icon-keynote {
+  background-image: url(../images/icon/Keynote.svg);
+}
+.icon .icon-apple-store {
+  background-image: url(../images/icon/AppleStore.svg);
+}
+.icon .icon-itunes-u {
+  background-image: url(../images/icon/iTunesU.svg);
+}
+.icon .icon-podcasts {
+  background-image: url(../images/icon/Podcasts.svg);
+}
+.icon .icon-tips {
+  background-image: url(../images/icon/Tips.svg);
+}
+.icon .icon-voice-memos {
+  background-image: url(../images/icon/VoiceMemos.svg);
+}
+.icon .icon-tv {
+  background-image: url(../images/icon/TV.svg);
+}
+section.pagination {
+  height: 15px;
+  margin-top: 20px;
+  margin-bottom: 7px;
+  text-align: center;
+}
+section.pagination i {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin: 0 7px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+section.pagination i.active {
+  background-color: white;
+}
+section.dock {
+  position: relative;
+  height: 192px;
+  padding: 28px 54px;
+  overflow: hidden;
+}
+section.dock::before,
+section.dock::after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin-top: -28px;
+  margin-left: -54px;
+}
+section.dock::before {
+  background-image: url(../images/wallpaper.jpg);
+  background-size: 750px 1334px;
+  background-position-y: 192px;
+  filter: blur(24px);
+}
+section.dock::after {
+  background-color: rgba(255, 255, 255, 0.66);
+}
+section.dock .icon {
+  z-index: 1;
+}
