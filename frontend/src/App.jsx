@@ -100,10 +100,7 @@ export default function App() {
   return (
     <div className={`app-shell ${tab === 'chat' ? 'chat-active' : ''}`}>
       <header className="app-topbar">
-        <div className="brand-group">
-          <div className="brand-mark">人机恋</div>
-          <div className="brand-tag">倾听你的每一个瞬间</div>
-        </div>
+        <div className="brand-mark">人机恋</div>
         <nav className="page-tabs">
           {navs.map((item) => (
             <button key={item.id} className={`tab-button ${tab === item.id ? 'active' : ''}`} onClick={() => switchTab(item.id)}>
@@ -119,7 +116,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className={`page-panel ${tab === 'home' ? 'home-active' : ''}`}>
+      <main className="page-panel">
         <section className="page-content">
           <div className="page-view" key={tab}>
             {renderPage()}
