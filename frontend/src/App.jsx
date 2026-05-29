@@ -41,20 +41,11 @@ export default function App() {
     }
   }
 
-  const [batteryLevel] = useState(78)
-
   return (
     <div className="phone-frame" id="phone-screen">
       <div className="status-bar">
         <span id="status-bar-time" />
-        <div className="status-icons">
-          <div className="battery-container">
-            <span className="battery-text">{batteryLevel}%</span>
-            <div className="battery-icon">
-              <div className="battery-level" style={{ width: `${batteryLevel}%` }} />
-            </div>
-          </div>
-        </div>
+        <div className="status-icons" />
       </div>
       {renderApp()}
     </div>

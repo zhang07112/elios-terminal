@@ -11,6 +11,7 @@ export default function Chat({ api, onBack }) {
   const btm = useRef(null)
   const chatMessages = useRef(null)
   const inputRef = useRef(null)
+  const longPressTimer = useRef(null)
 
   useEffect(() => {
     try {
@@ -49,6 +50,7 @@ export default function Chat({ api, onBack }) {
     const t = el.textContent.trim()
     if (!t || loading) return
     el.textContent = ''
+    el.dataset.hasContent = ''
     setMsgs(p => [...p, { role: 'user', content: t, id: Date.now(), time: Date.now() }])
     setLoading(true)
     try {
@@ -70,8 +72,6 @@ export default function Chat({ api, onBack }) {
       send()
     }
   }
-
-  const longPressTimer = useRef(null)
 
   const handleMsgMouseDown = (id) => {
     longPressTimer.current = setTimeout(() => {
@@ -106,16 +106,13 @@ export default function Chat({ api, onBack }) {
   return (
     <div id="chat-interface-screen" className={selectionMode ? 'selection-mode' : ''}>
       <div className="header">
-        <button className="back-btn" onClick={onBack} aria-label="返回"></button>
-        <div id="chat-header-title-wrapper">
+        <button className="back-btn" onClick={onBack} aria-label="返回" />
+        <div className="chat-header-avatar" />
+        <div id="chat-header-center">
           <div id="chat-header-title">Elios</div>
-          <div className="status">在线</div>
+          <div id="chat-header-status">在线</div>
         </div>
-        <button id="chat-settings-btn" aria-label="关注"></button>
-        <button id="listen-together-btn" aria-label="一起听"></button>
-        <button id="char-heart-btn" aria-label="心声"></button>
-        <button id="open-memory-screen-btn" aria-label="记忆"></button>
-        <button id="group-announcement-btn" aria-label="公告"></button>
+        <button id="chat-settings-btn" aria-label="更多" />
         <div className="selection-controls">
           <button className="action-btn" onClick={() => {
             if (selectedIds.size === msgs.length) setSelectedIds(new Set())

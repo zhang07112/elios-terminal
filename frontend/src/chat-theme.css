@@ -1,1425 +1,634 @@
-/* 聊天界面整体布局 */
+/* ===== 聊天界面整体布局 ===== */
 #chat-interface-screen {
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 !important;
-  min-height: 0 !important;
-  background: #ffffff !important;
-  position: relative !important;
-  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
 }
 
-/* 消息列表容器 */
+/* ===== 消息列表容器 ===== */
 #chat-messages {
-  flex: 1 !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  padding: 8px 12px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 2px !important;
-  min-height: 0 !important;
-  -webkit-overflow-scrolling: touch !important;
-  background: #ffffff !important;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  background: #ffffff;
 }
 
-/* 确保message-wrapper使用flex布局 */
+/* ===== 顶部导航栏 ===== */
+#chat-interface-screen .header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  background: #ffffff;
+  border-bottom: 1px solid #e9e9e9;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  min-height: 56px;
+}
+
+/* 返回按钮 */
+#chat-interface-screen .header .back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0;
+  background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%235d5d5d\' stroke-width=\'2.5\' stroke-linecap=\'round\'%3E%3Cpolyline points=\'15 18 9 12 15 6\'/%3E%3C/svg%3E');
+  background-size: 22px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 头像 */
+#chat-interface-screen .header .chat-header-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin: 0 10px;
+  background-image: url('https://img.heliar.top/file/1767675230609_Screenshot_20260106_123552_com.xingin.xhs_edit_1119938920718752.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #e0e0e0;
+}
+
+/* 中间信息区 */
+#chat-header-center {
+  flex: 1;
+  min-width: 0;
+}
+
+#chat-header-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #5d5d5d;
+  line-height: 1.3;
+}
+
+#chat-header-status {
+  font-size: 11px;
+  color: #999999;
+  line-height: 1.3;
+}
+
+/* 右侧设置按钮 */
+#chat-settings-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%235d5d5d\' stroke-width=\'2\' stroke-linecap=\'round\'%3E%3Ccircle cx=\'12\' cy=\'12\' r=\'1\'/%3E%3Ccircle cx=\'19\' cy=\'12\' r=\'1\'/%3E%3Ccircle cx=\'5\' cy=\'12\' r=\'1\'/%3E%3C/svg%3E');
+  background-size: 22px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 隐藏不需要的按钮 */
+#listen-together-btn,
+#char-heart-btn,
+#open-memory-screen-btn,
+#group-announcement-btn {
+  display: none;
+}
+
+
+/* ===== 消息与气泡 ===== */
+
 .message-wrapper {
-  display: flex !important;
-  gap: 6px !important;
-  max-width: 100% !important;
+  display: flex;
+  gap: 6px;
+  max-width: 100%;
+  margin-bottom: 2px;
+  align-items: flex-start;
+  position: relative;
 }
 
 .message-wrapper.ai {
-  justify-content: flex-start !important;
+  justify-content: flex-start;
 }
 
 .message-wrapper.user {
-  justify-content: flex-end !important;
-}
-
-.message-bubble {
-  max-width: 78% !important;
-  overflow-wrap: break-word !important;
-  word-break: break-word !important;
-}
-
-/* 全局颜色 */
-:root {  
-/* 边框颜色: 用于列表项之间的分割线、输入框边框等 */
-    --border-color: #e9e9e9; 
-/* 主要文字颜色: 用于标题、正文等绝大部分需要清晰阅读的文字 */
-    --text-primary: #5d5d5d; 
-/* 次要文字颜色: 用于时间戳、提示文字等辅助性文本 */
-    --text-secondary: #5d5d5d; 
-/* 主题强调色: 用于可交互的元素，如发送按钮、返回按钮、链接、激活状态的图标等 */
-    --accent-color: #5d5d5d; 
-}
-/* 精准清除顶栏分割线和边框，不影响其他样式 */
-#chat-interface-screen .header {
-border-bottom: none !important;
-box-shadow: none !important;
-outline: none !important;
-}
-/* 精准清除顶栏内部元素的分割线 */
-#chat-interface-screen .header > * {
-border-bottom: none !important;
-box-shadow: none !important;
-}
-/* 精准清除底部栏分割线 */
-#chat-input-area {
-border-top: none !important;
-border-bottom: none !important;
-box-shadow: none !important;
-outline: none !important;
-}
-/* 精准清除底部栏内部元素的分割线 */
-#chat-input-area > *,
-#chat-input-container,
-#chat-input-actions-top {
-border-top: none !important;
-border-bottom: none !important;
-box-shadow: none !important;
-outline: none !important;}
-/* 修改页面主标题"消息"的样式 */
-#chat-list-title {
-    background: #5d5d5d;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 500;
-}
-/* 修改"群聊"标签的样式 */
-.chat-list-item .group-tag {
-    background-color: #e9e9e9;
-    color: #8f8f8f;
-    font-weight: 500;
-}
-/* 最顶部的状态栏 (时间与电量) */
-/* a. 时间文字颜色 */
-#status-bar-time {
-  color: #9b9b9b !important;
-  font-size: 14.5px !important;
-  box-shadow: none !important; 
-  text-shadow: none !important;
-}
-/* b. 电量百分比文字颜色 */
-.battery-text {
-  color: #9b9b9b !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-/* c. 电池图标边框颜色 */
-.battery-icon {
-  border-color: #9b9b9b !important;
-}
-/* d. 电池图标右侧小凸起颜色 */
-.battery-icon::after {
-  background-color: #9b9b9b !important;
-}
-/* e. 电池内部电量条颜色 */
-.battery-level {
-  background-color: #9b9b9b !important;
-}
-/* 充电状态下的颜色 */
-/* a. 充电时电量文字颜色 */
-.battery-container.charging .battery-text {
-  color: #5d5d5d !important;}
-/* b. 充电时电量条颜色 */
-.battery-container.charging .battery-level {
-  background-color: #5d5d5d !important;
-}
-
-
-/* ====== 1. 聊天页顶部导航栏 ===== */
-
-/* 1. 顶栏容器 */
-#chat-interface-screen .header {
-  position: relative !important;
-  background-image: url('https://img.heliar.top/file/1767854879576_Screenshot_20251228_192706.jpg') !important; /* 修改顶栏背景图 */
-  background-repeat: no-repeat !important;
-  background-position: center center !important;
-  background-size: cover !important;
-  height: 190px !important; /* 修改顶栏高度 */
-  box-shadow: none !important;
-  border-bottom: none !important;
-  backdrop-filter: none !important; 
-  -webkit-backdrop-filter: none !important;
-  background-color: #ffffff !important; 
-  overflow: visible !important;
-}
-
-/* 2. 右侧独立小图标 */
-#chat-interface-screen .header::before {
-  display: block !important;
-  content: '' !important;
-  position: absolute !important;
-  width: 10px !important;
-  height: 10px !important;
-  right: 25px !important; 
-  top: 170px !important; 
-  left: auto !important; 
-  bottom: auto !important; 
-  background-image: url('https://img.heliar.top/file/1767711471784_retouch_2026010622561803.png') !important;
-  background-size: contain !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  border: none !important; 
-  border-radius: 0 !important;
-  box-shadow: none !important; 
-  z-index: 20 !important; 
-  pointer-events: none !important;
-}
-
-/* 3. 顶栏底部白色卡片 */
-#chat-interface-screen .header::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: -1px !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 110px !important; /* 修改高度 */
-  background-color: #ffffff !important;
-  border-radius: 15px 15px 0 0 !important; 
-  z-index: 5 !important;
-  pointer-events: none !important;
-}
-
-/* 4. 备注名容器 */
-#chat-header-title-wrapper {
-  position: absolute !important;
-  left: 97px !important;
-  top: auto !important;
-  bottom: 64px !important; /* 备注名整体上下移动 */
-  transform: none !important;
-  z-index: 10 !important;
-  overflow: visible !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important; 
-  justify-content: center !important;
-}
-
-/* 数据文字 */
-#chat-header-title-wrapper::before {
-  content: '5                     20K                         13.14M' !important;
-  position: absolute !important;
-  top: 50px !important; /* 上下移动 */
-  left: -67px !important; /* 左右移动 */
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
-  font-size: 15px !important; 
-  font-weight: 700 !important; 
-  color: #7d7d7d !important;   
-  white-space: pre !important;
-  pointer-events: none !important;
-}
-
-/* 标签文字 */
-#chat-header-title-wrapper::after {
-  content: '  Follow                   Followers                       Like' !important;
-  position: absolute !important;
-  top: 51px !important; /* 上下移动 */
-  left: -62px !important; /* 左右移动 */
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
-  font-size: 14px !important; 
-  font-weight: 600 !important; 
-  color: #999999 !important;   
-  white-space: pre !important;
-  pointer-events: none !important;
-}
-
-/* 5. 备注名样式 */
-#chat-header-title {
-  position: relative !important;
-  display: inline-block !important;
-  background: transparent !important;
-  padding: 0 !important;
-  border: none !important;
-  color: #6d6d6d !important; 
-  text-shadow: none !important; 
-  font-size: 17px !important; /* 备注名大小 */
-  font-weight: 700 !important; /* 备注名粗细 */
-  text-align: left !important;
-  line-height: 1.2 !important;
-}
-
-/* 6. 清除原先挂在标题上的装饰 */
-#chat-header-title::before,
-#chat-header-title::after {
-  display: none !important;
-  content: none !important;
-}
-
-/* 7. 状态文字样式 */
-#chat-header-title-wrapper [class*="status"]:not(#chat-header-title),
-#chat-header-title-wrapper [id*="status"]:not(#chat-header-title) {
-  display: block !important;
-  color: #999999 !important; 
-  font-size: 12px !important;
-  margin-top: 0px !important; 
-  text-align: left !important; 
-  align-self: flex-start !important; 
-}
-
-/* 8. 隐藏状态栏小圆点 */
-.status-dot,
-#chat-header-status .status-dot,
-#chat-header-title-wrapper .status-dot {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-}
-#chat-header-title-wrapper [class*="status"]::before,
-#chat-header-title-wrapper [id*="status"]::before {
-  display: none !important;
-  content: none !important;
-}
-
-
-/* ====== 2. 顶部按钮组 ====== */
-
-/* 1. 返回键：头像！！！ */
-#chat-interface-screen .header .back-btn {
-  position: absolute !important;
-  z-index: 100 !important;
-  pointer-events: auto !important;
-  top: auto !important;
-  bottom: 65px !important; 
-  left: 20px !important; 
-  width: 65px !important;
-  height: 65px !important;
-  background-image: url('https://img.heliar.top/file/1767675230609_Screenshot_20260106_123552_com.xingin.xhs_edit_1119938920718752.jpg') !important; /* 修改头像图片 */
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  border-radius: 50% !important;
-  border: 3px solid #ffffff !important; 
-  background-color: #ffffff !important;
-  color: transparent !important; 
-  font-size: 0 !important;
-}
-#chat-interface-screen .header .back-btn::before,
-#chat-interface-screen .header .back-btn::after {
-  display: none !important; 
-}
-
-/*  2. 聊天设置按钮 (右侧Follow按钮) */
-#chat-settings-btn {
-  position: absolute !important;
-  z-index: 100 !important;
-  pointer-events: auto !important;
-  top: 90px !important; /* 设置键上下移动 */
-  right: 17px !important; /* 设置键左右移动 */
-  width: 75px !important; 
-  height: 30px !important;
-  opacity: 1 !important; 
-  overflow: visible !important; 
-  background-image: url('https://img.heliar.top/file/1768024536142_retouch_2026011013552083.png') !important;
-  background-size: contain !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-radius: 0 !important; 
-  box-shadow: none !important;
-  padding: 0 !important;
-}
-#chat-settings-btn img { display: none !important; }
-
-/* 个性签名 */
-#chat-settings-btn::before {
-  content: '下雨天了怎么办 我好想你' !important; /* 修改个性签名 */
-  position: absolute !important;
-  top: 74.5px !important; /* 个性签名上下移动 */
-  right: calc(100vw - 202px) !important; /* 调整202px这个值控制左右移动 */
-  font-size: 12px !important;
-  color: #999999 !important; 
-  font-weight: 400 !important;
-  white-space: nowrap !important;
-  width: auto !important;
-  height: auto !important;
-  background: none !important;
-  border: none !important;
-  pointer-events: none !important; 
-}
-
-/* 个性签名左侧小图标 */
-#chat-settings-btn::after {
-  content: '' !important;
-  position: absolute !important;
-  top: 77px !important; /* 小图标上下移动 */
-  right: calc(100vw - 59px) !important; /* 调整59px这个值控制左右移动 */
-  width: 12px !important;
-  height: 12px !important;
-  background-image: url('https://img.heliar.top/file/1767970713411_retouch_2026010922581569.png') !important;
-  background-size: contain !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  background-color: transparent !important;
-  border: none !important; 
-  border-radius: 0 !important;
-  pointer-events: none !important; 
-}
-
-/* 3. 一起听按钮 */
-#listen-together-btn {
-  position: absolute !important;
-  z-index: 100 !important;
-  pointer-events: auto !important;
-  top: 100px !important;
-  right: 90px !important;
-  width: 24px !important;
-  height: 24px !important;
-  opacity: 0 !important;
-  background-color: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-}
-
-/* 4. 心声按钮 */
-#char-heart-btn {
-  position: absolute !important;
-  z-index: 100 !important;
-  pointer-events: auto !important;
-  top: 100px !important;
-  right: 130px !important;
-  width: 25px !important;
-  height: 25px !important;
-  opacity: 0 !important;
-  background-color: transparent !important;
-  border: none !important;
-}
-
-/* 5. 记忆总结按钮和公告栏按钮 */
-#open-memory-screen-btn,
-#group-announcement-btn {
-  opacity: 0 !important; 
-}
-
-
-/* ========聊天页底部输入栏=========== */
-
-/* 1. 底栏容器 */
-#chat-input-area {
-  position: relative !important;
-  background-color: #ffffff !important; 
-  padding: 12px 15px !important; 
-  min-height: 65px !important; /* 底栏高度调整 */
-  box-sizing: border-box !important;
-  border-top: none !important; 
-  box-shadow: none !important;
-  outline: none !important;
-  overflow: visible !important; 
-  z-index: 100 !important;
-}
-
-#chat-input-area::before { display: none !important; }
-#chat-input-area > * { position: relative !important; z-index: 10 !important; }
-
-/* ======= 主输入行布局 ========= */
-#chat-input-main-row {
-  position: relative !important;
-  display: flex !important; 
-  align-items: flex-end !important; 
-  width: 100% !important;
-  gap: 8px !important; 
-  margin: 0 !important;
-  padding: 0 !important; 
-}
-
-/* ============= 输入框样式 =============== */
-#chat-input {
-  flex: 1 !important; 
-  width: 100% !important;
-  background-color: #fcfcfc !important; 
-  border: 1px solid #f2f2f2 !important; 
-  border-radius: 15px !important;        
-  color: #666666 !important;
-  box-shadow: none !important;
-  min-height: 34px !important; 
-  line-height: 1.4 !important; 
-  margin: 0 !important;
-  padding: 6px 20px 6px 55px !important; 
-  box-sizing: border-box !important;
-  white-space: pre-wrap !important; 
-  word-break: break-word !important;
-  position: relative !important;
-  z-index: 1 !important; 
-}
-
-#chat-input:focus {
-  outline: none !important;
-  background-color: #fcfcfc !important; 
-  border-color: #eaeaea !important;
-}
-
-#chat-input::placeholder { color: transparent !important; }
-
-/* 占位文字 */
-#chat-input-main-row::before {
-  content: '🤍…^보고 싶어요...ㅠㅠ' !important; /* 修改输入框占位文字 */
-  font-size: 15px !important; 
-  color: #c0c0c0 !important; 
-  position: absolute !important;
-  left: 0 !important; 
-  right: 40px !important; /* 左右移动 */
-  top: 50% !important; 
-  transform: translateY(-50%) !important;
-  text-align: center !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  pointer-events: none !important;
-  z-index: 20 !important;
-}
-#chat-input-main-row:focus-within::before { opacity: 0 !important; }
-
-
-/* ========= 底部功能按钮组========= */
-
-/* 1. 菜单容器 */
-#chat-input-actions-top {
-  position: absolute !important;
-  left: 20px !important; 
-  bottom: 15px !important; /* 菜单按钮上下移动 */
-  width: 40px !important;  
-  height: 40px !important;
-  border-radius: 20px !important;
-  z-index: 9999 !important; 
-  background: transparent !important; 
-  border: none !important;
-  padding: 0 !important;
-  cursor: pointer !important;
-  pointer-events: auto !important; 
-  transition: width 0.2s ease, height 0.2s ease, bottom 0.2s ease, border-radius 0.2s ease, background-color 0.2s ease !important;
-  transform-origin: bottom left !important;
-  overflow: visible !important; 
-}
-
-/* 2. 菜单按钮图标 */
-#chat-input-actions-top::before {
-  content: '' !important;
-  position: absolute !important;
-  width: 25px !important; 
-  height: 25px !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  background: url('https://img.heliar.top/file/1767692406803_retouch_2026010617370655.png') center/contain no-repeat !important;
-  opacity: 1 !important;
-  transition: opacity 0.1s !important;
-  pointer-events: none !important;
-}
-
-/* 3. 激活状态 (上浮 + 展开) */
-#chat-input-actions-top:hover,
-#chat-input-actions-top:focus-within {
-  width: auto !important;
-  min-width: 240px !important;
-  height: auto !important;
-  background-color: #FFFFFF !important; 
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-  border: 1px solid #e0e0e0 !important;
-  left: 15px !important; 
-  bottom: 65px !important; /* 菜单展开栏上下移动 */
-  padding: 8px !important; 
-  border-radius: 12px !important;
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  grid-auto-rows: auto !important;
-  column-gap: 5px !important; 
-  row-gap: 5px !important;
-}
-
-/* 4. 隐形桥梁 (防闪退) */
-#chat-input-actions-top:hover::after,
-#chat-input-actions-top:focus-within::after {
-  content: '' !important;
-  position: absolute !important;
-  top: 100% !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 60px !important; 
-  background: transparent !important;
-  z-index: -1 !important;
-}
-
-#chat-input-actions-top:hover::before,
-#chat-input-actions-top:focus-within::before { opacity: 0 !important; }
-
-/* 5. 菜单内按钮 (延迟显示防误触) */
-#chat-input-actions-top .chat-action-icon-btn,
-#chat-input-actions-top #reroll-btn {
-  visibility: hidden !important; 
-  opacity: 0 !important;
-  position: absolute !important; 
-  pointer-events: none !important;
-  flex-direction: column !important;
-  align-items: center !important; 
-  justify-content: center !important;
-  width: 100% !important;
-  height: 32px !important; 
-  background: transparent !important;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 6px !important; 
-  cursor: pointer !important;
-  transition: none !important;
-}
-
-#chat-input-actions-top:hover .chat-action-icon-btn,
-#chat-input-actions-top:focus-within .chat-action-icon-btn,
-#chat-input-actions-top:hover #reroll-btn,
-#chat-input-actions-top:focus-within #reroll-btn {
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important; 
-  display: flex !important;
-  pointer-events: auto !important;
-  transition: opacity 0.2s ease 0.2s, visibility 0s linear 0.2s !important;
-}
-
-#chat-input-actions-top .chat-action-icon-btn:hover, 
-#chat-input-actions-top #reroll-btn:hover { background-color: #f5f5f5 !important; }
-
-#chat-input-actions-top .chat-action-icon-btn svg,
-#chat-input-actions-top #reroll-btn svg,
-#chat-input-actions-top .chat-action-icon-btn img,
-#chat-input-actions-top #reroll-btn img {
-  width: 18px !important;
-  height: 18px !important;
-  display: block !important;
-  margin-bottom: 0 !important;
-}
-
-/* 发送按钮 */
-#send-btn {
-  all: unset !important;
-  display: inline-block !important;
-  width: 27px !important;
-  height: 27px !important;
-  
-  margin-bottom: 5px !important; /* 发送按钮上下移动 */
-  cursor: pointer !important;
-  background-image: url('https://img.heliar.top/file/1767692492803_retouch_2026010617393177.png') !important;
-  background-position: center !important;
-  background-size: contain !important; 
-  background-repeat: no-repeat !important;
-  background-color: transparent !important;
-  color: transparent !important;
-  position: relative !important;
-  z-index: 999 !important;
-  flex-shrink: 0 !important; 
-}
-
-/* 等待回复按钮 */
-#wait-reply-btn {
-  background: transparent !important;
-  background-image: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  margin-bottom: 5px !important; /* 等待回复按钮上下移动 */
-  position: relative !important;
-  z-index: 999 !important;
-  flex-shrink: 0 !important;
-  width: 27px !important;
-  height: 27px !important;
-}
-
-#wait-reply-btn::before, #wait-reply-btn::after { display: none !important; }
-
-#wait-reply-btn img {
-  content: url('https://img.heliar.top/file/1767692527831_retouch_2026010617394876.png') !important;
-  height: 27px !important;
-  width: 27px !important;
-  object-fit: contain !important;
-  display: block !important;
-  background: transparent !important; 
-  box-shadow: none !important;
-}
-
-
-/* === 系统消息 & 时间戳卡片 == */
-
-.date-stamp-bubble,
-.recalled-message-placeholder,
-.message-bubble.system-bubble {
-    background-color: #ffffff !important;
-    border: 1px solid #e9e9e9 !important; 
-    border-radius: 10px !important;
-    color: #8a8a8a !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    font-size: 11px !important;
-    padding: 4px 12px !important;
-    margin: 10px auto !important;
-}
-
-/* 夜间模式适配 */
-#phone-screen.dark-mode .date-stamp-bubble,
-#phone-screen.dark-mode .recalled-message-placeholder,
-#phone-screen.dark-mode .message-bubble.system-bubble {
-    background-color: #2c2c2e !important;
-    border-color: #38383a !important;
-    color: #8d8d92 !important;
-}
-
-
-/* ===========气泡样式=============== */
-
-/* --- 1. 核心布局与防截断 --- */
-.message-wrapper,
-.message-bubble,
-.message-bubble .content {
-  overflow: visible !important;
-  transform: none !important;
-  clip-path: none !important;
-}
-
-/* --- 2. 头像样式 --- */
-.message-wrapper .avatar, 
-.message-wrapper .message-avatar,
-#chat-interface-screen .avatar {
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 50% !important;
-  border: 1px solid #e0e0e0 !important;
-  flex-shrink: 0 !important;
-  margin-top: -3px !important; 
-}
-
-/* --- 3. 气泡整体布局 --- */
-.message-wrapper {
-  margin-bottom: 2px !important; 
-  padding: 0 !important;
-  align-items: flex-start !important; 
-  position: relative !important;
+  justify-content: flex-end;
 }
 
 /* 增加底部间距 */
 .message-wrapper:not(:has(+ .message-wrapper)) {
-    margin-bottom: 25px !important;
+    margin-bottom: 25px;
 }
 
 /* 紧凑间距 */
 .message-wrapper.ai + .message-wrapper.user,
 .message-wrapper.user + .message-wrapper.ai {
-  margin-top: -5px !important; 
+  margin-top: -5px;
 }
 
 /* 气泡位置 */
 .message-bubble {
-  margin-top: 5px !important; 
+  margin-top: 5px;
+  max-width: 78%;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
-/* --- 4. 气泡外观 (排除图片类名) --- */
-.message-bubble .content {  
-  line-height: 1.5 !important; 
-  padding: 4px 8px !important; 
-  box-shadow: none !important;
-  position: relative !important; 
+/* 头像 */
+.message-wrapper .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  margin-top: -3px;
+  background-image: url('https://img.heliar.top/file/1767675230609_Screenshot_20260106_123552_com.xingin.xhs_edit_1119938920718752.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.message-wrapper.user .avatar {
+  background-image: none;
+  background-color: #e0e0e0;
+}
+
+/* 气泡内容 */
+.message-bubble .content {
+  line-height: 1.5;
+  padding: 4px 8px;
+  box-shadow: none;
+  position: relative;
 }
 
 /* 对方气泡 (AI) */
-.message-bubble.ai:not(.is-transfer):not(.is-waimai-request):not(.is-poll):not(.is-link-share):not(.is-location-share):not(.is-sticker):not(.is-ai-image):not(.has-image) .content {
-  background-color: #fcfcfc !important;
-  line-height: 1.5 !important; 
-  padding: 4px 8px !important; 
-  color: #999999 !important; 
-  border: 1px solid #e0e0e0 !important; 
-  border-radius: 15px !important;       
+.message-bubble.ai .content {
+  background-color: #fcfcfc;
+  color: #666666;
+  border: 1px solid #e0e0e0;
+  border-radius: 15px;
 }
 
 /* 我方气泡 (User) */
-.message-bubble.user:not(.is-transfer):not(.is-waimai-request):not(.is-poll):not(.is-link-share):not(.is-location-share):not(.is-sticker):not(.is-ai-image):not(.has-image) .content {
-  color: #999999 !important; 
-  line-height: 1.5 !important; 
-  padding: 4px 8px !important; 
-  background-color: #f2f2f2 !important; 
-  border: 1px solid #e8e8e8 !important; 
-  border-radius: 15px !important;       
+.message-bubble.user .content {
+  color: #666666;
+  background-color: #f2f2f2;
+  border: 1px solid #e8e8e8;
+  border-radius: 15px;
 }
 
-/* --- 5. 连续消息处理 --- */
-
-/* === 对方连续 (AI) === */
-.message-wrapper.ai + .message-wrapper.ai { 
-    margin-top: -16px !important; 
-    padding-left: 0 !important; 
+/* 连续消息处理 - 对方连续 */
+.message-wrapper.ai + .message-wrapper.ai {
+    margin-top: -16px;
+    padding-left: 0;
 }
 
-.message-wrapper.ai + .message-wrapper.ai .message-bubble { 
-    margin-top: 0 !important; 
+.message-wrapper.ai + .message-wrapper.ai .message-bubble {
+    margin-top: 0;
 }
 
-.message-wrapper.ai + .message-wrapper.ai .avatar { 
-    display: block !important;
-    visibility: hidden !important;
-    width: 32px !important;  
-    height: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    outline: none !important;
+.message-wrapper.ai + .message-wrapper.ai .avatar {
+    display: block;
+    visibility: hidden;
+    width: 32px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
 }
 
-
-/* === 我方连续 (User) === */
-.message-wrapper.user + .message-wrapper.user { 
-    margin-top: -16px !important; 
-    padding-right: 0 !important; 
+/* 连续消息处理 - 我方连续 */
+.message-wrapper.user + .message-wrapper.user {
+    margin-top: -16px;
+    padding-right: 0;
 }
 
 .message-wrapper.user + .message-wrapper.user .message-bubble {
-    margin-top: 0 !important; 
+    margin-top: 0;
 }
 
-.message-wrapper.user + .message-wrapper.user .avatar { 
-    display: block !important;
-    visibility: hidden !important;
-    width: 32px !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    outline: none !important;
+.message-wrapper.user + .message-wrapper.user .avatar {
+    display: block;
+    visibility: hidden;
+    width: 32px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
 }
 
-
-/* --- 6. 图片/表情包彻底去气泡 --- */
-.message-bubble.is-sticker .content,
-.message-bubble.is-ai-image .content,
-.message-bubble.has-image .content,
-.message-bubble:has(img):not(.emoji) .content {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
+/* 气泡小尾巴 - 我方 */
+.message-bubble.user .content::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: -3px;
+  right: -6px;
+  width: 10.5px;
+  height: 11px;
+  background-image: url('https://img.heliar.top/file/1767859648896_retouch_2026010816070504_edit_126374798978405.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 0;
+  pointer-events: none;
 }
 
-
-/* --- 7. 气泡小尾巴 --- */
-
-/* 我方 (User) 小尾巴 */
-.message-bubble.user:not(.is-transfer):not(.is-waimai-request):not(.is-poll):not(.is-link-share):not(.is-location-share):not(.is-sticker):not(.is-ai-image):not(.has-image) .content::after {
-  content: '' !important;
-  display: block !important;
-  position: absolute !important;
-  bottom: -3px !important;   
-  right: -6px !important;    
-  width: 10.5px !important;    
-  height: 11px !important;   
-  background-image: url('https://img.heliar.top/file/1767859648896_retouch_2026010816070504_edit_126374798978405.png') !important;
-  background-size: contain !important;
-  background-repeat: no-repeat !important;
-  z-index: 0 !important; 
-  pointer-events: none !important;
+/* 气泡小尾巴 - 对方 */
+.message-bubble.ai .content::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: -3px;
+  left: -6px;
+  width: 10.5px;
+  height: 11px;
+  background-image: url('https://img.heliar.top/file/1767859342610_retouch_2026010816020214.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* 对方 (AI) 小尾巴 */
-.message-bubble.ai:not(.is-transfer):not(.is-waimai-request):not(.is-poll):not(.is-link-share):not(.is-location-share):not(.is-sticker):not(.is-ai-image):not(.has-image) .content::after {
-  content: '' !important;
-  display: block !important;
-  position: absolute !important;
-  bottom: -3px !important;   
-  left: -6px !important;    
-  width: 10.5px !important;    
-  height: 11px !important;   
-  background-image: url('https://img.heliar.top/file/1767859342610_retouch_2026010816020214.png') !important;
-  background-size: contain !important;
-  background-repeat: no-repeat !important;
-  z-index: 0 !important; 
-  pointer-events: none !important;
+/* 隐藏连续消息的尾巴 */
+.message-wrapper.user + .message-wrapper.user .message-bubble.user .content::after {
+  content: none;
+  display: none;
 }
 
-/* 隐藏连续消息/图片的尾巴 */
-
-/* 1. 隐藏我方连续消息 */
-.message-wrapper.user + .message-wrapper.user .message-bubble.user:not(.is-transfer):not(.is-waimai-request):not(.is-poll):not(.is-link-share):not(.is-location-share):not(.is-sticker):not(.is-ai-image):not(.has-image) .content::after {
-  content: none !important;
-  display: none !important;
+.message-wrapper.ai + .message-wrapper.ai .message-bubble.ai .content::after {
+  content: none;
+  display: none;
 }
 
-/* 2. 隐藏对方连续消息 */
-.message-wrapper.ai + .message-wrapper.ai .message-bubble.ai:not(.is-transfer):not(.is-waimai-request):not(.is-poll):not(.is-link-share):not(.is-location-share):not(.is-sticker):not(.is-ai-image):not(.has-image) .content::after {
-  content: none !important;
-  display: none !important;
+/* 时间戳 */
+.timestamp {
+  display: none;
+  position: absolute;
+  top: 100%;
+  bottom: auto;
+  background: transparent;
+  border: none;
+  color: #b0b0b0;
+  font-size: 10px;
+  padding: 0;
+  line-height: 1;
+  height: 12px;
+  z-index: 10;
+  white-space: nowrap;
 }
 
-/* 3. 隐藏图片消息 */
-.message-bubble:has(img) .content::after, 
-.message-bubble.has-image .content::after,
-.message-bubble.is-sticker .content::after {
-  content: none !important;
-  display: none !important;
+.message-wrapper.ai:not(:has(+ .message-wrapper.ai)) .timestamp {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  left: 53px;
+  right: auto;
+  justify-content: flex-start;
 }
 
-
-/* --- 8. 时间戳 & 状态图标 --- */
-
-.timestamp, .message-time {
-  display: none !important; 
-  position: absolute !important;
-  top: 100% !important;     
-  bottom: auto !important;
-  background: transparent !important; border: none !important;
-  text-shadow: none !important;  
-  color: #b0b0b0 !important; 
-  font-size: 10px !important; 
-  padding: 0 !important; line-height: 1 !important; height: 12px !important;
-  z-index: 10 !important; white-space: nowrap !important;
+.message-wrapper.ai .timestamp::before {
+  content: '已读';
+  margin-right: 4px;
+  font-size: 9.7px;
+  color: #b0b0b0;
+  position: relative;
+  top: -0.4px;
 }
 
-/* === 对方 (AI) === */
-.message-wrapper.ai:not(:has(+ .message-wrapper.ai)) .timestamp,
-.message-wrapper.ai:not(:has(+ .message-wrapper.ai)) .message-time {
-  display: flex !important; align-items: center !important;
-  margin-top: 5px !important; 
-  left: 53px !important;       
-  right: auto !important;
-  justify-content: flex-start !important;
-}
-.message-wrapper.ai .timestamp::before, .message-wrapper.ai .message-time::before {
-  content: '已读'; margin-right: 4px !important; 
-  font-size: 9.7px !important; 
-  color: #b0b0b0 !important;   
-  position: relative !important; top: -0.4px !important; 
+.message-wrapper.user:not(:has(+ .message-wrapper.user)) .timestamp {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  right: 47px;
+  left: auto;
+  justify-content: flex-end;
 }
 
-/* === 我方 (User) === */
-.message-wrapper.user:not(:has(+ .message-wrapper.user)) .timestamp,
-.message-wrapper.user:not(:has(+ .message-wrapper.user)) .message-time {
-  display: flex !important; align-items: center !important;
-  margin-top: 5px !important; 
-  right: 47px !important;      
-  left: auto !important;
-  justify-content: flex-end !important;
-}
-/* 双对勾图标 */
-.message-wrapper.user .timestamp::after, .message-wrapper.user .message-time::after {
-  content: '' !important; display: inline-block !important;
-  width: 16px !important; height: 10px !important; margin-left: 2px !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 12' fill='none' stroke='%23b0b0b0' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 6 L4 9 L10 1'/%3E%3Cpath d='M7 9 L13 1'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important; background-position: center bottom !important; background-size: contain !important;
+.message-wrapper.user .timestamp::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 10px;
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 12' fill='none' stroke='%23b0b0b0' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 6 L4 9 L10 1'/%3E%3Cpath d='M7 9 L13 1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
 }
 
-
-/* 分类设置图片大小 */
-
-/* A. 普通图片、AI图、系统图 */
-.ai-generated-image, 
-.realimag-image, 
-.chat-image, 
-.message-bubble .content img:not(.emoji):not(.sticker-image) {
-  border-radius: 10px !important;
-  display: block !important;
-  width: auto !important; 
-  height: auto !important;
-  max-width: 135px !important; 
-  max-height: 200px !important;
-  object-fit: cover !important;
-}
-
-/* B. 表情包 */
-.message-bubble .sticker-image,
-.message-bubble.is-sticker img {
-  border-radius: 10px !important;
-  display: block !important;
-  width: auto !important; 
-  height: auto !important;
-  max-width: 100px !important; 
-  max-height: 100px !important;
-  object-fit: cover !important;
-}
-
-
-/* ======= 语音消息、引用消息、文字生成占位图 ========= */
-
-/* 1. 修改群聊"成员们正在输入" */
+/* 正在输入 */
 #typing-indicator {
-    font-size: 0 !important;
-    background-color: #ffffff !important; 
-    border: 1px solid #e9e9e9 !important; 
-    border-radius: 15px !important;       
-    padding: 3px 12px !important; 
-    width: fit-content !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    box-shadow: none !important;
+    font-size: 0;
+    background-color: #ffffff;
+    border: 1px solid #e9e9e9;
+    border-radius: 15px;
+    padding: 3px 12px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: none;
 }
 
 #typing-indicator::before {
-    content: "小猫爪打字中…" !important;
-    font-size: 12px !important; 
-    color: #b0b0b0 !important;
-}
-
-/* 2. 语音消息卡片 */
-.message-bubble.is-voice-message .content {
-    padding: 2px 8px !important; 
-    line-height: 0 !important;
-    min-height: 0 !important;
-    border: 1px solid #dadada !important; 
-    border-radius: 15px !important;      
-}
-
-.voice-message-body {
-    height: 21.5px !important;  
-    min-height: 21.5px !important;
-    min-width: 40px !important; 
-    display: flex !important;
-    align-items: center !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-.voice-waveform {
-    height: 11px !important;   
-    margin: 0 5px !important;
-}
-
-.voice-duration {
-    font-size: 11px !important; 
-    line-height: 21.5px !important;
-}
-
-.message-bubble.ai .voice-waveform div { background-color: #999999 !important; }
-.message-bubble.ai .voice-duration { color: #999999 !important; }
-.message-bubble.user .voice-waveform div { background-color: #999999 !important; }
-.message-bubble.user .voice-duration { color: #999999 !important; }
-
-/* === 语音转文字卡片修改 === */
-
-/* 1. 基础样式 */
-.voice-transcript {
-    padding: 2px 6px !important; 
-    line-height: 1.5 !important; 
-    margin-top: 3px !important;
-    border-radius: 6px !important;
-    font-size: 12px !important;
-    color: #999999 !important;
-    word-break: break-word !important; 
-}
-
-/* 2. 我方语音转文字卡片 */
-.message-bubble.user .voice-transcript {
-    background-color: #fbfbfb !important; 
-}
-
-/* 3. 对方语音转文字卡片 */
-.message-bubble.ai .voice-transcript {
-    background-color: #f5f5f5 !important;
+    content: "小猫爪打字中…";
+    font-size: 12px;
+    color: #b0b0b0;
 }
 
 
-/* 3. 引用消息 */
-.quoted-message {
-    position: absolute !important;
-    top: -30px !important; 
-    margin: 0 !important;
-    background-color: transparent !important; 
-    
-    border-left: 3px solid #d0d0d0 !important; 
-    border-radius: 2px !important; 
-    height: 20px !important;
-    line-height: 20px !important;
-    padding: 0 8px !important;
-    width: fit-content !important;
-    max-width: 160px !important;
-    z-index: 10 !important;
-    display: flex !important;
-    align-items: center !important;
+/* ===== 底部输入栏 ===== */
+#chat-input-area {
+  background-color: #ffffff;
+  padding: 12px 15px;
+  min-height: 65px;
+  box-sizing: border-box;
+  border-top: 1px solid #e9e9e9;
+  overflow: visible;
+  z-index: 100;
+  flex-shrink: 0;
 }
 
-/* 调整防重叠间距 */
-#chat-messages .message-wrapper:has(.quoted-message),
-.message-wrapper.ai:has(.quoted-message),
-.message-wrapper.user:has(.quoted-message) {
-    margin-top: 15px !important; 
-    padding-top: 0 !important;
+#chat-input-main-row {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
 }
 
-.quoted-message .quoted-sender { display: none !important; }
-
-.quoted-message .quoted-content {
-    display: block !important;
-    color: #999999 !important;
-    font-size: 11px !important;
-    max-width: 10em !important; 
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    margin: 0 !important;
+/* 输入框 */
+#chat-input {
+  flex: 1;
+  width: 100%;
+  background-color: #fcfcfc;
+  border: 1px solid #f2f2f2;
+  border-radius: 15px;
+  color: #666666;
+  box-shadow: none;
+  min-height: 34px;
+  max-height: 80px;
+  line-height: 1.4;
+  margin: 0;
+  padding: 6px 20px 6px 55px;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: break-word;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  outline: none;
 }
 
-.message-bubble.ai .quoted-message { left: 0 !important; right: auto !important; }
-.message-bubble.user .quoted-message { right: 0 !important; left: auto !important; flex-direction: row !important; }
-
-/* 4. 文字生成图片占位图 */
-#chat-messages .message-bubble.is-ai-image .ai-generated-image {
-  content: url('https://img.heliar.top/file/1767871149045_Screenshot_20260108_191357_com.xingin.xhs_edit_1280954832974503.jpg') !important;
-  object-fit: cover !important;
-  width: 120px !important; 
-  height: 120px !important;
-  border-radius: 12px !important;
+#chat-input:focus {
+  background-color: #fcfcfc;
+  border-color: #eaeaea;
 }
 
+/* 占位文字 */
+#chat-input-main-row::before {
+  content: '🤍…^보고 싶어요...ㅠㅠ';
+  font-size: 15px;
+  color: #c0c0c0;
+  position: absolute;
+  left: 0;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 20;
+}
+#chat-input-main-row:focus-within::before { opacity: 0; }
 
-/* --- 群聊成员名字位置调整 --- */
-.message-wrapper.ai .sender-name {
-  position: relative !important;
-  top: 8.5px !important;              
-  left: -15px !important;
-  color: #666666 !important;
-  font-weight: 500 !important;
-  margin-bottom: 0 !important;
+/* 菜单按钮容器 */
+#chat-input-actions-top {
+  position: absolute;
+  left: 20px;
+  bottom: 15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  z-index: 9999;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: width 0.2s ease, height 0.2s ease, bottom 0.2s ease, border-radius 0.2s ease, background-color 0.2s ease;
+  transform-origin: bottom left;
+  overflow: visible;
 }
 
-
-/* === 转账卡片=== */
-
-/* 1. 基础容器 */
-#chat-messages .message-bubble .transfer-card,
-.transfer-card {
-    width: 215px !important;
-    padding: 2px 12px !important;
-    min-height: 0 !important;
-    height: auto !important;
-    border: 1px solid #e9e9e9 !important;
-    border-radius: 12px !important;
-    box-shadow: none !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    position: relative !important;
-    z-index: 1 !important;
-    overflow: visible !important;
+/* 菜单按钮图标 */
+#chat-input-actions-top::before {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: url('https://img.heliar.top/file/1767692406803_retouch_2026010617370655.png') center/contain no-repeat;
+  opacity: 1;
+  transition: opacity 0.1s;
+  pointer-events: none;
 }
 
-/* 2. 背景颜色 */
-#chat-messages .message-bubble.user .transfer-card {
-    background: #f2f2f2 !important;
-    margin-left: auto !important; 
-    margin-right: 0px !important;
-}
-#chat-messages .message-bubble.ai .transfer-card {
-    background: #fcfcfc !important;
-    margin-right: auto !important; 
-    margin-left: 0px !important;
-}
-
-/* 3. 清除 ::before 伪元素，保留 ::after 用于新装饰 */
-.transfer-card::before,
-#chat-messages .message-bubble .transfer-card::before {
-    display: none !important;
-    content: none !important;
-}
-
-/* 3.5. 创建右侧装饰 (使用 ::after) */
-#chat-messages .message-bubble .transfer-card::after {
-    content: '' !important;
-    display: block !important;
-    position: absolute !important;
-    z-index: 2 !important; 
-    width: 55px !important;
-    height: 65px !important;
-    top: 50% !important;
-    right: 8px !important; 
-    transform: translateY(-50%) !important; 
-    background-image: url('https://img.heliar.top/file/1766924826152_retouch_2025122719483647_edit_1531810387150285.png') !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    pointer-events: none !important;
+/* 激活状态 (上浮 + 展开) */
+#chat-input-actions-top:hover,
+#chat-input-actions-top:focus-within {
+  width: auto;
+  min-width: 240px;
+  height: auto;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  left: 15px;
+  bottom: 65px;
+  padding: 8px;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: auto;
+  column-gap: 5px;
+  row-gap: 5px;
 }
 
-/* 4. 文字颜色 */
-#chat-messages .message-bubble .transfer-card .transfer-title,
-#chat-messages .message-bubble .transfer-card .transfer-amount,
-#chat-messages .message-bubble .transfer-card .transfer-note,
-.transfer-card * {
-    color: #a8a8a8 !important;
-    text-shadow: none !important;
-    font-weight: normal !important;
-    position: relative !important;
-    z-index: 10 !important; 
-    background: transparent !important;
+/* 隐形桥梁 (防闪退) */
+#chat-input-actions-top:hover::after,
+#chat-input-actions-top:focus-within::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: transparent;
+  z-index: -1;
 }
 
-/* 5. 金额样式 */
-#chat-messages .message-bubble .transfer-card .transfer-amount {
-    font-weight: 500 !important;
-    font-size: 24px !important;
-    margin: 2px 0 !important;
-    position: relative !important;
-    bottom: 2px !important;
+#chat-input-actions-top:hover::before,
+#chat-input-actions-top:focus-within::before { opacity: 0; }
+
+/* 菜单内按钮 */
+#chat-input-actions-top .chat-action-icon-btn {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 32px;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: none;
+  font-size: 12px;
+  color: #666;
+  font-family: inherit;
 }
 
-/* 6. 备注栏样式 */
-#chat-messages .message-bubble .transfer-card .transfer-note {
-    border-top: none !important; 
-    padding-top: 2px !important; 
-    margin-top: 4px !important;
-    font-size: 12px !important;
+#chat-input-actions-top:hover .chat-action-icon-btn,
+#chat-input-actions-top:focus-within .chat-action-icon-btn {
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  display: flex;
+  pointer-events: auto;
+  transition: opacity 0.2s ease 0.2s, visibility 0s linear 0.2s;
 }
 
-
-/* === 发起转账弹窗 === */
-
-/* 1. 弹窗容器 */
-.transfer-content {
-    background-color: #ffffff !important;   
-    background-image: none !important;     
-    border: 1px solid #e0e0e0 !important;  
-    border-radius: 20px !important;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1) !important; 
-    
-    /* 保持布局 */
-    width: 290px !important;
-    padding: 20px !important;
-    text-align: center !important;
+#chat-input-actions-top .chat-action-icon-btn:hover {
+  background-color: #f5f5f5;
 }
 
-/* 2. 标题 */
-.transfer-header {
-    color: #333333 !important;
-    font-size: 20px !important;
-    font-weight: 500 !important;
-    margin-bottom: 20px !important;
+/* 发送按钮 */
+#send-btn {
+  all: unset;
+  display: inline-block;
+  width: 27px;
+  height: 27px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background-image: url('https://img.heliar.top/file/1767692492803_retouch_2026010617393177.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  position: relative;
+  z-index: 999;
+  flex-shrink: 0;
 }
 
-/* 3. 输入框标签 */
-.transfer-input-group label {
-    color: #888888 !important; 
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    display: block !important;
-    margin-bottom: 5px !important;
+/* 等待回复按钮 */
+#wait-reply-btn {
+  background: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 5px;
+  position: relative;
+  z-index: 999;
+  flex-shrink: 0;
+  width: 27px;
+  height: 27px;
 }
 
-/* 4. 输入框 */
-.transfer-input-group input {
-    border: 1px solid #cccccc !important;
-    background-color: #ffffff !important;
-    color: #333333 !important;
-    
-    /* 保持布局 */
-    width: 100% !important;
-    padding: 12px !important;
-    border-radius: 10px !important;
-    font-size: 16px !important;
-    box-sizing: border-box !important;
-}
-/* 输入框聚焦时 */
-.transfer-input-group input:focus {
-    border-color: #999999 !important;
-    outline: none !important;
-}
-
-/* === 底部按钮区域 === */
-.transfer-actions button {
-    flex: 1 !important;
-    padding: 12px !important;
-    border-radius: 10px !important;
-    font-size: 16px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    transition: background-color 0.2s !important;
-}
-
-/* 5. "取消"按钮 */
-#transfer-cancel-btn {
-    background-color: #ffffff !important;
-    border: 1px solid #e0e0e0 !important;
-    font-weight: 500 !important;
-    color: #aaaaaa !important; 
-}
-#transfer-cancel-btn:hover {
-    background-color: #f9f9f9 !important;
-}
-
-/* 6. "确认转账"按钮 */
-#transfer-confirm-btn {
-    background-color: #ffffff !important;
-    border: 1px solid #cccccc !important;
-    font-weight: 500 !important;
-    color: #666666 !important;
-}
-#transfer-confirm-btn:hover {
-    background-color: #f5f5f5 !important;
-}
-
-/* --- 弹窗主容器 (卡片本身) --- */
-#transfer-actions-modal .transfer-actions-content {
-  background: #ffffff;
-  border: 1px solid #e9e9e9 !important;  
-  border-radius: 15px !important;        
-  box-shadow: 0 5px 25px rgba(93, 93, 93, 0.8)!important;
-
- /* 【字体】统一弹窗内的字体 */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-}
-
-/* --- 弹窗标题 ("请选择操作") --- */
-#transfer-actions-modal .transfer-actions-header {
-  font-size: 20px !important;
-  font-weight: 600 !important;
-  color: #5d5d5d !important;
-}
-
-/* --- 弹窗正文 ("你收到了来自...") --- */
-#transfer-actions-modal .transfer-actions-body p {
-  font-size: 15px !important;
-  color: #9e9e9e !important;
-}
-
-/* --- "开心收下"按钮样式 --- */
-#transfer-actions-modal .action-btn.accept {
-  background: #ffffff !important;
-  box-shadow: 0 4px 10px rgba(184, 184, 184, 1)!important;
-  border: none !important;
-  border-radius: 12px !important;
-  color: #888888 !important;
-}
-
-/* --- "残忍拒绝"按钮样式 --- */
-#transfer-actions-modal .action-btn.decline {
-  background: #ffffff !important;
-  box-shadow: 0 4px 10px !important;
-  border: none !important;
-  border-radius: 12px !important;
-  color: #b8b8b8 !important;
-}
-
-/* --- 右上角的"x"关闭按钮 --- */
-#transfer-actions-modal .cancel-btn {
-  background-color: #ffffff !important;
-  color: #9e9e9e !important;
-  border-radius: 50% !important;
-  width: 28px !important;
-  height: 28px !important;
-  font-size: 20px !important;
-  line-height: 28px !important;
+#wait-reply-btn img {
+  content: url('https://img.heliar.top/file/1767692527831_retouch_2026010617394876.png');
+  height: 27px;
+  width: 27px;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+  box-shadow: none;
 }
 
 
-/* === 重构外卖卡片=== */
-
-/* 1. 卡片整体容器 */
-.waimai-card {
-  background-image: none !important;
-  background-color: #f9f9f9 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
-  border: 1px solid #e9e9e9 !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-}
-
-/* 2. 上半部分：白色背景 */
-.waimai-header {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #f5f5f5 !important;
-}
-
-/* 3. 下半部分：浅灰色背景 */
-.waimai-main {
-  background-color: #f0f0f0 !important; 
-  padding: 15px !important;
-}
-
-/* 4. 内部支付框 */
-.waimai-main .payment-box {
-  background-color: #e0e0e0 !important;
-  box-shadow: none !important;
-  border: none !important;
-  padding: 0 !important;
-}
-
-/* 5. 所有文字颜色*/
-.waimai-header .title-group .brand,
-.waimai-header .title-group,
-.waimai-catchphrase,
-.waimai-main .request-title,
-.waimai-main .amount,
-.waimai-main .payment-label,
-.waimai-main .countdown-label,
-.waimai-main .countdown-timer span {
-  color: #666666 !important; 
-  text-shadow: none !important;
-  font-weight: normal !important;
-}
-
-/* 6. 按钮样式 */
-.waimai-details-btn {
-  background-color: #ffffff !important;
-  color: #666666 !important; 
-  border: 1px solid #e0e0e0 !important;
-  margin-top: 10px !important;
-}
-
-/* 7. 状态文字修正 */
-.message-bubble.status-paid .waimai-main .request-title,
-.message-bubble.status-rejected .waimai-main .request-title {
-  color: #666666 !important; 
+/* ===== 图片大小 ===== */
+.message-bubble .content img {
+  border-radius: 10px;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 135px;
+  max-height: 200px;
+  object-fit: cover;
 }
 
 
-/* === 多选操作栏 === */
-
-/* 1. 默认状态 */
+/* ===== 多选操作栏 ===== */
 #chat-interface-screen .header .selection-controls {
-  display: none !important;
+  display: none;
 }
 
-/* 2. 激活状态 */
 #chat-interface-screen.selection-mode .header .selection-controls {
-  display: flex !important;
-  position: absolute !important;
-
-/* 垂直位置 */
-  top: 80px !important; /* 操作栏位置上下移动 如果修改了聊天页顶栏高度也许需要修改 */          
-  bottom: auto !important;
-  left: 0 !important;
-  width: 100% !important;
-  
-  justify-content: space-between !important;
-  align-items: center !important;
-  
-  padding: 0 20px 0 20px !important; 
-  
-  box-sizing: border-box !important;
-  z-index: 100 !important;
-  
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
+  display: flex;
+  position: absolute;
+  top: 80px;
+  bottom: auto;
+  left: 0;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  z-index: 100;
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
-/* 3. 普通按钮样式 */
 #chat-interface-screen.selection-mode .header .selection-controls .action-btn {
-  font-size: 16px !important;
-  font-weight: 500 !important;
-  color: #5d5d5d !important; /* 操作栏按钮颜色 */
-  background: none !important;
-  border: none !important;
-  padding: 5px 10px !important;
+  font-size: 16px;
+  font-weight: 500;
+  color: #5d5d5d;
+  background: none;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-/* 4. 删除按钮变红色 */
-#chat-interface-screen.selection-mode .header .selection-controls .action-btn:last-child,
 #chat-interface-screen.selection-mode .header .selection-controls #delete-msgs-btn {
-  color: #ff3b30 !important; /* 删除按钮颜色修改 */
+  color: #ff3b30;
 }
 
-/* 5. 多选时隐藏原标题 */
-#chat-interface-screen.selection-mode #chat-header-title-wrapper {
-  opacity: 0 !important;
-  pointer-events: none !important;
+#chat-interface-screen.selection-mode #chat-header-title {
+  opacity: 0;
+  pointer-events: none;
 }
