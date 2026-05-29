@@ -436,12 +436,12 @@ body {
   font-size: 15px;
   line-height: 1.8;
   box-shadow: var(--shadow-sm);
-  max-width: min(450px, 80%);
+  max-width: min(500px, 80vw);
   width: fit-content;
-  min-width: max-content;
   border: 1px solid var(--color-border-light);
-  word-wrap: break-word;
-  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .chat-message.user .message-bubble {
@@ -1040,26 +1040,6 @@ body {
   
   .call-title {
     font-size: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .app-shell {
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
-  }
-  
-  .home-title {
-    font-size: 26px;
-  }
-  
-  .tab-button {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 13px;
-  }
-  
-  .message-bubble {
-    max-width: 100%;
   }
 }
 
