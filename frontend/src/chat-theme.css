@@ -170,7 +170,9 @@
 }
 
 .message-wrapper.user .avatar {
-  display: none;
+  background: #d4cfc6;
+  color: #ffffff;
+  font-size: 16px;
 }
 
 /* 气泡内容 */
@@ -229,6 +231,18 @@
     margin-top: 0;
 }
 
+.message-wrapper.user + .message-wrapper.user .avatar {
+    display: block;
+    visibility: hidden;
+    width: 32px;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+}
+
 /* AI连续，调整圆角 */
 .message-wrapper.ai + .message-wrapper.ai .message-bubble.ai .content {
   border-bottom-left-radius: 17px;
@@ -242,30 +256,32 @@
   border-bottom-right-radius: 4px;
 }
 
-/* 气泡小尾巴 - 我方（绿色三角） */
+/* 气泡小尾巴 - 我方 */
 .message-bubble.user .content::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  right: -7px;
+  bottom: 3px;
+  right: -5px;
   width: 8px;
-  height: 10px;
+  height: 8px;
   background: #7cbf9a;
-  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  transform: rotate(45deg);
+  border-radius: 0 0 2px 0;
   z-index: 0;
   pointer-events: none;
 }
 
-/* 气泡小尾巴 - 对方（米色三角） */
+/* 气泡小尾巴 - 对方 */
 .message-bubble.ai .content::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: -7px;
+  bottom: 3px;
+  left: -5px;
   width: 8px;
-  height: 10px;
+  height: 8px;
   background: #edebe5;
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  transform: rotate(45deg);
+  border-radius: 0 0 0 2px;
   z-index: 0;
   pointer-events: none;
 }

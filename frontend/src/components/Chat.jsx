@@ -155,6 +155,7 @@ export default function Chat({ api, onBack }) {
               <div className={`message-bubble ${m.role === 'assistant' ? 'ai' : 'user'}`}>
                 <div className="content">{m.content}</div>
               </div>
+              {m.role === 'user' && <div className="avatar">我</div>}
               {showTs && timeStr && <div className="timestamp">{timeStr}</div>}
             </div>
           )
