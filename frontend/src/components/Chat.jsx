@@ -8,10 +8,15 @@ export default function Chat({ api, onBack }) {
   const [loading, setLoading] = useState(false)
   const [selectionMode, setSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState(new Set())
+  const [userAvatar, setUserAvatar] = useState('')
   const btm = useRef(null)
   const chatMessages = useRef(null)
   const inputRef = useRef(null)
   const longPressTimer = useRef(null)
+
+  useEffect(() => {
+    try { setUserAvatar(localStorage.getItem('elios-avatar') || '') } catch {}
+  }, [])
 
   useEffect(() => {
     try {
@@ -155,7 +160,16 @@ export default function Chat({ api, onBack }) {
               <div className={`message-bubble ${m.role === 'assistant' ? 'ai' : 'user'}`}>
                 <div className="content">{m.content}</div>
               </div>
-              {m.role === 'user' && <div className="avatar">我</div>}
+              {m.role === 'user' && (
+                <div className="avatar">
+                  {userAvatar ? <img src={userAvatar} alt="" /> : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16 }}>
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  )}
+                </div>
+              )}
               {showTs && timeStr && <div className="timestamp">{timeStr}</div>}
             </div>
           )

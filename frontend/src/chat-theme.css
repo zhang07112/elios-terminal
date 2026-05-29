@@ -173,6 +173,13 @@
   background: #d4cfc6;
   color: #ffffff;
   font-size: 16px;
+  overflow: hidden;
+}
+
+.message-wrapper.user .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* 气泡内容 */
@@ -256,32 +263,28 @@
   border-bottom-right-radius: 4px;
 }
 
-/* 气泡小尾巴 - 我方 */
+/* 气泡小尾巴 - 我方（绿色三角） */
 .message-bubble.user .content::after {
   content: '';
   position: absolute;
-  bottom: 3px;
-  right: -5px;
-  width: 8px;
-  height: 8px;
-  background: #7cbf9a;
-  transform: rotate(45deg);
-  border-radius: 0 0 2px 0;
+  bottom: -1px;
+  right: -7px;
+  border: 7px solid transparent;
+  border-bottom-color: #7cbf9a;
+  border-right-color: #7cbf9a;
   z-index: 0;
   pointer-events: none;
 }
 
-/* 气泡小尾巴 - 对方 */
+/* 气泡小尾巴 - 对方（米色三角） */
 .message-bubble.ai .content::after {
   content: '';
   position: absolute;
-  bottom: 3px;
-  left: -5px;
-  width: 8px;
-  height: 8px;
-  background: #edebe5;
-  transform: rotate(45deg);
-  border-radius: 0 0 0 2px;
+  bottom: -1px;
+  left: -7px;
+  border: 7px solid transparent;
+  border-bottom-color: #edebe5;
+  border-left-color: #edebe5;
   z-index: 0;
   pointer-events: none;
 }
