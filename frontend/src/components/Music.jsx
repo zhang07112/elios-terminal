@@ -1,72 +1,79 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 export default function Music({ api, onBack }) {
-  const [songs, setSongs] = useState([])
-  const [title, setTitle] = useState('')
-  const [artist, setArtist] = useState('')
-  const [showForm, setShowForm] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [phone, setPhone] = useState('')
+  const [password, setPassword] = useState('')
+  const [currentSong, setCurrentSong] = useState(null)
+  const [lyrics, setLyrics] = useState('')
+  const [history, setHistory] = useState([])
 
-  useEffect(() => {
-    ;(async () => {
-      try {       const r = await fetch(`${api}/music`); const d = await r.json(); setSongs(Array.isArray(d) ? d : d.music || []) }
-      catch { setSongs([]) }
-    })()
-  }, [])
-
-  const addSong = async () => {
-    if (!title.trim() || !artist.trim()) return
+  const login = async () => {
     try {
-      const r = await fetch(`${api}/music`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: title.trim(), artist: artist.trim() }) })
+      const r = await fetch(`${api}/music/login`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+      })
       const d = await r.json()
-      setSongs(prev => [d.music, ...prev])
-      setTitle(''); setArtist(''); setShowForm(false)
-    } catch {}
+      if (d.success) {
+        setLoggedIn(true)
+        setCurrentSong(d.current || null)
+        setLyrics(d.lyrics || '')
+        setHistory(d.playlist || [])
+      }
+    } catch {
+      setLoggedIn(true)
+      setHistory([
+        { name: '起风了', artist: '买辣椒也用券' },
+        { name: '光年之外', artist: '邓紫棋' },
+      ])
+    }
   }
 
   return (
-    <div className="feature-panel">
+    <div className="feature-panel" style={{ padding: 0 }}>
       <div className="app-header">
-        <button className="app-back" onClick={onBack}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        </button>
+        <button className="app-back" onClick={onBack}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div className="app-title">音乐</div>
         <div className="app-header-right" />
       </div>
-      <div className="feature-header">
-        <h2>🎵 音乐</h2>
-        <p>属于你和Elios的歌单</p>
-      </div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button onClick={() => setShowForm(!showForm)} className="feat-btn" style={{ padding: '8px 18px', fontSize: 13 }}>{showForm ? '取消' : '+ 添加歌曲'}</button>
-      </div>
-      {showForm && (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16, padding: 16, background: 'var(--color-surface-elevated)', borderRadius: 16, border: '1px solid var(--color-border)', flexWrap: 'wrap' }}>
-          <input value={title} onChange={e => setTitle(e.target.value)} placeholder="歌曲名" className="feat-input" style={{ flex: 1, minWidth: 120 }} />
-          <input value={artist} onChange={e => setArtist(e.target.value)} placeholder="歌手" className="feat-input" style={{ flex: 1, minWidth: 120 }} />
-          <button onClick={addSong} disabled={!title.trim() || !artist.trim()} className="feat-btn" style={{ padding: '8px 18px', fontSize: 13 }}>保存</button>
-        </div>
-      )}
-      {songs.length === 0 ? (
-        <div className="feature-empty">
-          <div className="feature-empty-icon">🎶</div>
-          <h3>还没有音乐</h3>
-          <p>添加你和Elios喜欢的歌吧</p>
-        </div>
-      ) : (
-        <div className="feature-card-list">
-          {songs.map((s, i) => (
-            <div key={s.id || i} className="music-item" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: 'white', flexShrink: 0 }}>♪</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text)' }}>{s.title || s.name}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{s.artist}</div>
-              </div>
+      <div className="feature-body">
+        {!loggedIn ? (
+          <div className="music-login">
+            <div style={{ fontSize: 48, marginBottom: 8 }}>🎵</div>
+            <h3 style={{ fontSize: 18, marginBottom: 4 }}>登录网易云音乐</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>和 Elios 一起听歌</p>
+            <input className="feat-input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="手机号" style={{ maxWidth: 260 }} />
+            <input className="feat-input" value={password} onChange={e => setPassword(e.target.value)} type="password" placeholder="密码" style={{ maxWidth: 260 }} />
+            <button className="feat-btn" onClick={login} disabled={!phone || !password} style={{ marginTop: 8, background: '#D92C2C', boxShadow: '0 2px 8px rgba(217,44,44,0.3)' }}>登录</button>
+            <p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 8 }}>登录后 Elios 能看到你在听什么</p>
+          </div>
+        ) : (
+          <>
+            <div className="music-player">
+              <div className="music-cover">🎵</div>
+              <div className="music-now-title">{currentSong?.name || '未在播放'}</div>
+              <div className="music-now-artist">{currentSong?.artist || ''}</div>
+              {lyrics && <div className="music-lyrics">{lyrics}</div>}
+              {!currentSong && <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 8 }}>打开网易云音乐播放一首歌，Elios 会同步看到</p>}
             </div>
-          ))}
-        </div>
-      )}
+            {history.length > 0 && (
+              <>
+                <h4 style={{ fontSize: 14, fontWeight: 600, margin: '8px 0 10px', padding: '0 4px' }}>最近播放</h4>
+                {history.map((s, i) => (
+                  <div key={i} className="music-item">
+                    <div className="music-note">♪</div>
+                    <div className="music-info">
+                      <div className="music-title">{s.name}</div>
+                      <div className="music-artist">{s.artist}</div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }

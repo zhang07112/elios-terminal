@@ -52,12 +52,12 @@ export default function Study({ api, onBack }) {
         <h2>学习陪伴</h2>
         <p>和Elios一起专注，番茄工作法</p>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '32px 0', background: 'linear-gradient(135deg, rgba(124,191,154,0.08), rgba(148,201,115,0.08))', borderRadius: 24, marginBottom: 16 }}>
-        <div style={{ fontSize: 64, fontWeight: 700, color: isBreak ? 'var(--color-accent)' : 'var(--color-primary-dark)', fontVariantNumeric: 'tabular-nums' }}>{fm(time)}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '32px 0', background: 'linear-gradient(135deg, rgba(212,163,74,0.08), rgba(232,213,163,0.08))', borderRadius: 24, marginBottom: 16 }}>
+        <div style={{ fontSize: 64, fontWeight: 700, color: isBreak ? '#D4A34A' : '#1C1C1E', fontVariantNumeric: 'tabular-nums' }}>{fm(time)}</div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{isBreak ? '☕ 休息时间' : '📚 专注学习中'}</div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button onClick={() => { if (running) { clearInterval(intv.current); setRunning(false) } else setRunning(true) }} className="feat-btn" style={{ minWidth: 90 }}>{running ? '暂停' : '开始'}</button>
-          <button onClick={() => { clearInterval(intv.current); setRunning(false); setTime(isBreak ? 5 * 60 : 25 * 60); setIsBreak(false); setMsg('') }} className="feat-btn" style={{ background: 'var(--color-surface)', color: 'var(--text)', boxShadow: 'none' }}>重置</button>
+          <button onClick={() => { clearInterval(intv.current); setRunning(false); setTime(isBreak ? 5 * 60 : 25 * 60); setIsBreak(false); setMsg('') }} className="feat-btn" style={{ background: 'var(--surface-secondary)', color: 'var(--text)', boxShadow: 'none' }}>重置</button>
         </div>
       </div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -65,16 +65,16 @@ export default function Study({ api, onBack }) {
         <button onClick={() => { if (topic.trim()) { setTime(25 * 60); setRunning(true); setIsBreak(false); setMsg('') } }} disabled={!topic.trim()} className="feat-btn">开始学习</button>
       </div>
       {msg && (
-        <div style={{ padding: 16, borderRadius: 16, background: 'linear-gradient(135deg, rgba(124,191,154,0.15), rgba(148,201,115,0.12))', marginBottom: 16, fontSize: 15, color: 'var(--color-primary-dark)', textAlign: 'center', fontWeight: 500 }}>
+        <div style={{ padding: 16, borderRadius: 16, background: 'linear-gradient(135deg, rgba(212,163,74,0.15), rgba(232,213,163,0.12))', marginBottom: 16, fontSize: 15, color: '#D4A34A', textAlign: 'center', fontWeight: 500 }}>
           🌿 {msg}
         </div>
       )}
       {sessions.length > 0 && (
         <div>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>📋 学习记录</div>
-          <div className="memory-list">
+          <div className="feature-card-list">
             {sessions.map((s, i) => (
-              <div key={i} className="memory-card" style={{ padding: 12 }}>
+              <div key={i} className="feature-card-item" style={{ padding: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-secondary)' }}>
                   <span>📚 {s.topic || '未知主题'}</span>
                   <span>{s.date ? new Date(s.date).toLocaleDateString('zh-CN') : ''}</span>

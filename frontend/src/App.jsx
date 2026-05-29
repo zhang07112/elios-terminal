@@ -1,69 +1,42 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import Home from './components/Home'
 import Chat from './components/Chat'
 import Diary from './components/Diary'
-import CalendarView from './components/CalendarView'
-import Memories from './components/Memories'
-import Study from './components/Study'
+import Read from './components/Read'
 import Music from './components/Music'
 import Photos from './components/Photos'
 import Mood from './components/Mood'
-import Goodnight from './components/Goodnight'
-import Read from './components/Read'
 import Phone from './components/Phone'
+import Goodnight from './components/Goodnight'
+import Study from './components/Study'
+import Memories from './components/Memories'
+import CalendarView from './components/CalendarView'
 import Settings from './components/Settings'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const API = import.meta.env.VITE_API_URL || 'https://elios-api.vercel.app/api'
 
 export default function App() {
-  const [app, setApp] = useState('home')
-  const [presence, setPresence] = useState(null)
-  const [avatars, setAvatars] = useState([])
-  const [currentAvatar, setCurrentAvatar] = useState(null)
-  const [memoryDirty, setMemoryDirty] = useState(0)
-  const [time, setTime] = useState('')
+  const [app, setApp] = useState(null)
 
-  useEffect(() => {
-    const update = () => {
-      const d = new Date()
-      setTime(d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }))
-    }
-    update()
-    const i = setInterval(update, 10000)
-    return () => clearInterval(i)
-  }, [])
+  const openApp = (name) => setApp(name)
+  const closeApp = () => setApp(null)
 
-  const fetchPresence = useCallback(async () => {
-    try { const r = await fetch(`${API}/cost`); const d = await r.json(); setPresence(d) }
-    catch { setPresence(null) }
-  }, [])
-
-  useEffect(() => { fetchPresence(); const i = setInterval(fetchPresence, 10000); return () => clearInterval(i) }, [fetchPresence])
-  useEffect(() => {
-    const f = async () => {
-      try { const r = await fetch(`${API}/avatars`); const d = await r.json(); setAvatars(d.avatars || []); setCurrentAvatar(d.current || null) }
-      catch {}
-    }
-    f(); const i = setInterval(f, 30000); return () => clearInterval(i)
-  }, [])
-
-  const openApp = (id) => setApp(id)
+  const common = { api: API, onBack: closeApp }
 
   const renderApp = () => {
     switch (app) {
-      case 'home': return <Home onOpen={openApp} />
-      case 'chat': return <Chat api={API} onBack={() => openApp('home')} memoryDirty={memoryDirty} setMemoryDirty={setMemoryDirty} />
-      case 'diary': return <Diary api={API} onBack={() => openApp('home')} />
-      case 'calendar': return <CalendarView api={API} onBack={() => openApp('home')} />
-      case 'memories': return <Memories api={API} dirty={memoryDirty} onBack={() => openApp('home')} />
-      case 'study': return <Study api={API} onBack={() => openApp('home')} />
-      case 'music': return <Music api={API} onBack={() => openApp('home')} />
-      case 'photos': return <Photos api={API} onBack={() => openApp('home')} />
-      case 'mood': return <Mood api={API} onBack={() => openApp('home')} />
-      case 'goodnight': return <Goodnight api={API} onBack={() => openApp('home')} />
-      case 'read': return <Read api={API} onBack={() => openApp('home')} />
-      case 'phone': return <Phone api={API} onBack={() => openApp('home')} />
-      case 'settings': return <Settings api={API} onBack={() => openApp('home')} avatars={avatars} currentAvatar={currentAvatar} onChange={() => {}} />
+      case 'chat': return <Chat {...common} />
+      case 'diary': return <Diary {...common} />
+      case 'read': return <Read {...common} />
+      case 'music': return <Music {...common} />
+      case 'photos': return <Photos {...common} />
+      case 'mood': return <Mood {...common} />
+      case 'phone': return <Phone {...common} />
+      case 'goodnight': return <Goodnight {...common} />
+      case 'study': return <Study {...common} />
+      case 'memories': return <Memories {...common} />
+      case 'calendar': return <CalendarView {...common} />
+      case 'settings': return <Settings {...common} avatars={[]} currentAvatar={null} onChange={() => {}} />
       default: return <Home onOpen={openApp} />
     }
   }
@@ -71,10 +44,10 @@ export default function App() {
   return (
     <div className="phone-frame">
       <div className="status-bar">
-        <span className="status-time">{time}</span>
+        <span className="status-time" id="statusTime" />
         <div className="status-icons">
-          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="20" height="12" rx="3" stroke="none"/><path d="M4 10h16v4H4z" fill="rgba(255,255,255,0.3)"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" stroke="none"/></svg>
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="2" ry="2"/><path d="M22 11v2"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
         </div>
       </div>
       {renderApp()}

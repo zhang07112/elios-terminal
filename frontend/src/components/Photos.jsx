@@ -39,11 +39,11 @@ export default function Photos({ api, onBack }) {
         <div className="app-header-right" />
       </div>
       <div className="feature-header">
-        <h2>📸 相册</h2>
+        <h2>相册</h2>
         <p>你和Elios的共同影像</p>
       </div>
       <div style={{ marginBottom: 16 }}>
-        <button disabled style={{ padding: '8px 18px', borderRadius: 999, border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--text-secondary)', fontSize: 13, cursor: 'not-allowed' }}>即将支持</button>
+        <button disabled style={{ padding: '8px 18px', borderRadius: 999, border: '1px solid var(--separator)', background: 'var(--surface)', color: 'var(--text-secondary)', fontSize: 13, cursor: 'not-allowed' }}>即将支持</button>
       </div>
       {photos.length === 0 ? (
         <div className="feature-empty">
@@ -52,9 +52,9 @@ export default function Photos({ api, onBack }) {
           <p>未来可以上传你和Elios的回忆瞬间</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
           {photos.map((p, i) => (
-            <div key={p.id || i} style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)', aspectRatio: 1 }}>
+            <div key={p.id || i} style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 4px var(--shadow)', aspectRatio: 1 }}>
               <img src={p.url || p.image_url} alt={p.title || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           ))}
