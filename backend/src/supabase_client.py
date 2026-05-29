@@ -10,6 +10,15 @@ _headers = {
 }
 
 
+# ------------------- Table Schemas (create manually in Supabase) -------------------
+# diaries: id (uuid, pk), date (date), content (text), author (text), created_at (timestamptz)
+# moods: id (uuid, pk), mood (text), note (text), created_at (timestamptz)
+# study_sessions: id (uuid, pk), topic (text), duration_minutes (int4), note (text), created_at (timestamptz)
+# music: id (uuid, pk), title (text), artist (text), url (text), created_at (timestamptz)
+# photos: id (uuid, pk), url (text), caption (text), created_at (timestamptz)
+# goodnight: id (uuid, pk), content (text), mood_before (text), created_at (timestamptz)
+
+
 # ------------------- Conversations -------------------
 def save_conversation_sync(role: str, content: str, metadata: dict = None) -> dict:
     url = f"{SUPABASE_URL}/rest/v1/conversations"
@@ -97,16 +106,24 @@ def get_diary_sync(date_str: str) -> dict | None:
     return None
 
 
-def save_diary_sync(date_str: str, content: str) -> dict:
+def save_diary_sync(date_str: str, content: str, author: str = "user") -> dict:
     url = f"{SUPABASE_URL}/rest/v1/diaries"
     existing = get_diary_sync(date_str)
-    data = {"date": date_str, "content": content}
+    data = {"date": date_str, "content": content, "author": author}
     if existing:
         response = httpx.patch(
             f"{url}?date=eq.{date_str}", headers=_headers, json=data
         )
     else:
         response = httpx.post(url, headers=_headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+
+def get_diaries_sync() -> list:
+    url = f"{SUPABASE_URL}/rest/v1/diaries"
+    params = {"order": "date.desc"}
+    response = httpx.get(url, headers=_headers, params=params)
     response.raise_for_status()
     return response.json()
 
@@ -201,6 +218,91 @@ def get_health_records_sync(limit: int = 10) -> list:
 def add_health_record_sync(record_type: str, value: str, note: str = "") -> dict:
     url = f"{SUPABASE_URL}/rest/v1/health_records"
     data = {"record_type": record_type, "value": value, "note": note}
+    response = httpx.post(url, headers=_headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+
+# ------------------- Moods -------------------
+def get_moods_sync(limit: int = 30) -> list:
+    url = f"{SUPABASE_URL}/rest/v1/moods"
+    params = {"limit": limit, "order": "created_at.desc"}
+    response = httpx.get(url, headers=_headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
+def save_mood_sync(mood: str, note: str = "") -> dict:
+    url = f"{SUPABASE_URL}/rest/v1/moods"
+    data = {"mood": mood, "note": note}
+    response = httpx.post(url, headers=_headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+
+# ------------------- Study Sessions -------------------
+def get_study_sessions_sync(limit: int = 20) -> list:
+    url = f"{SUPABASE_URL}/rest/v1/study_sessions"
+    params = {"limit": limit, "order": "created_at.desc"}
+    response = httpx.get(url, headers=_headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
+def save_study_session_sync(topic: str, duration_minutes: int, note: str = "") -> dict:
+    url = f"{SUPABASE_URL}/rest/v1/study_sessions"
+    data = {"topic": topic, "duration_minutes": duration_minutes, "note": note}
+    response = httpx.post(url, headers=_headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+
+# ------------------- Music -------------------
+def get_music_sync() -> list:
+    url = f"{SUPABASE_URL}/rest/v1/music"
+    params = {"order": "created_at.desc"}
+    response = httpx.get(url, headers=_headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
+def save_music_sync(title: str, artist: str, url: str = "") -> dict:
+    url_addr = f"{SUPABASE_URL}/rest/v1/music"
+    data = {"title": title, "artist": artist, "url": url}
+    response = httpx.post(url_addr, headers=_headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+
+# ------------------- Photos -------------------
+def get_photos_sync() -> list:
+    url = f"{SUPABASE_URL}/rest/v1/photos"
+    params = {"order": "created_at.desc"}
+    response = httpx.get(url, headers=_headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
+def save_photo_sync(url: str, caption: str = "") -> dict:
+    url_addr = f"{SUPABASE_URL}/rest/v1/photos"
+    data = {"url": url, "caption": caption}
+    response = httpx.post(url_addr, headers=_headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+
+# ------------------- Goodnight -------------------
+def get_goodnight_sync() -> list:
+    url = f"{SUPABASE_URL}/rest/v1/goodnight"
+    params = {"order": "created_at.desc"}
+    response = httpx.get(url, headers=_headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
+def save_goodnight_sync(content: str, mood_before: str = "") -> dict:
+    url = f"{SUPABASE_URL}/rest/v1/goodnight"
+    data = {"content": content, "mood_before": mood_before}
     response = httpx.post(url, headers=_headers, json=data)
     response.raise_for_status()
     return response.json()

@@ -1,31 +1,36 @@
-export default function Home({ onStart }) {
+export default function Home({ api, onStart, onNavigate }) {
+  const cards = [
+    { id: 'chat', icon: '💬', title: '聊天', desc: '他一直在这，等你开口', color: '#7cbf9a' },
+    { id: 'diary', icon: '📖', title: '日记', desc: '写下今天，他也写给你', color: '#94c973' },
+    { id: 'study', icon: '📚', title: '学习', desc: '番茄钟，他陪你专注', color: '#a8dcc3' },
+    { id: 'calendar', icon: '📅', title: '日程', desc: '一起计划每一天', color: '#7cbf9a' },
+    { id: 'mood', icon: '💭', title: '心情', desc: '告诉他你今天怎样', color: '#94c973' },
+    { id: 'music', icon: '🎵', title: '音乐', desc: '属于你们的歌单', color: '#a8dcc3' },
+    { id: 'photos', icon: '📸', title: '相册', desc: '珍藏每个瞬间', color: '#7cbf9a' },
+    { id: 'memories', icon: '💝', title: '回忆', desc: '他说他都记得', color: '#94c973' },
+    { id: 'goodnight', icon: '🌙', title: '晚安', desc: '让他陪你结束一天', color: '#a8dcc3' },
+    { id: 'phone', icon: '📞', title: '通话', desc: '听听他的声音', color: '#7cbf9a' },
+    { id: 'settings', icon: '⚙️', title: '设置', desc: '个性化你的空间', color: '#94c973' },
+  ]
+
   return (
     <div className="home-panel">
-      <div className="home-hero">
+      <div className="home-greeting">
+        <span className="home-greet-emoji">🌿</span>
         <div>
-          <div className="home-label">欢迎回来</div>
-          <h2 className="home-title">在这里，他会听你说，记你每一个当下。</h2>
-          <p className="home-copy">Elios 会把你的喜怒哀乐轻轻收藏，对你的故事温柔而认真。想说的时候，就对他倾诉。</p>
+          <div className="home-greet-text">欢迎回来</div>
+          <div className="home-greet-sub">Elios 在等你</div>
         </div>
-
-        <button className="hero-button" onClick={onStart}>开始聊天</button>
       </div>
 
-      <div className="home-card-grid">
-        <article className="home-card">
-          <div className="home-card-title">聊天记录</div>
-          <p className="home-card-text">你的每一次问候、每一个瞬间，都被温柔保存，成为他更懂你的理由。</p>
-        </article>
-
-        <article className="home-card">
-          <div className="home-card-title">回忆角落</div>
-          <p className="home-card-text">自动整理对话片段，帮你回顾曾经的暖心瞬间与细节。</p>
-        </article>
-
-        <article className="home-card">
-          <div className="home-card-title">语音陪伴</div>
-          <p className="home-card-text">轻触召唤他，聆听温柔复述，像朋友一样陪你待在此刻。</p>
-        </article>
+      <div className="feature-grid">
+        {cards.map((card) => (
+          <button key={card.id} className="feature-card" onClick={() => onNavigate(card.id)} style={{ '--card-accent': card.color }}>
+            <span className="feature-icon">{card.icon}</span>
+            <span className="feature-title">{card.title}</span>
+            <span className="feature-desc">{card.desc}</span>
+          </button>
+        ))}
       </div>
     </div>
   )
