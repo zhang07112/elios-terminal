@@ -16,7 +16,12 @@ export default function Chat({ api, onBack }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('elios-chat')
-      if (saved) setMsgs(JSON.parse(saved))
+      if (saved) {
+        let parsed = JSON.parse(saved)
+        parsed = parsed.map(m => ({ ...m, time: m.time || Date.now() }))
+        setMsgs(parsed)
+        localStorage.setItem('elios-chat', JSON.stringify(parsed))
+      }
     } catch {}
   }, [])
 

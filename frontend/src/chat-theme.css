@@ -242,34 +242,30 @@
   border-bottom-right-radius: 4px;
 }
 
-/* 气泡小尾巴 - 我方 */
+/* 气泡小尾巴 - 我方（绿色三角） */
 .message-bubble.user .content::after {
   content: '';
-  display: block;
   position: absolute;
-  bottom: -3px;
-  right: -6px;
-  width: 10.5px;
-  height: 11px;
-  background-image: url('https://img.heliar.top/file/1767859648896_retouch_2026010816070504_edit_126374798978405.png');
-  background-size: contain;
-  background-repeat: no-repeat;
+  bottom: 0;
+  right: -7px;
+  width: 8px;
+  height: 10px;
+  background: #7cbf9a;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
   z-index: 0;
   pointer-events: none;
 }
 
-/* 气泡小尾巴 - 对方 */
+/* 气泡小尾巴 - 对方（米色三角） */
 .message-bubble.ai .content::after {
   content: '';
-  display: block;
   position: absolute;
-  bottom: -3px;
-  left: -6px;
-  width: 10.5px;
-  height: 11px;
-  background-image: url('https://img.heliar.top/file/1767859342610_retouch_2026010816020214.png');
-  background-size: contain;
-  background-repeat: no-repeat;
+  bottom: 0;
+  left: -7px;
+  width: 8px;
+  height: 10px;
+  background: #edebe5;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
   z-index: 0;
   pointer-events: none;
 }
