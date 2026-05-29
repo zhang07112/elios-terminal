@@ -1,11 +1,11 @@
 {
   "builds": [
     {
-      "src": "API/index.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     },
     {
-      "src": "前端/package.json",
+      "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "dist"
@@ -13,7 +13,7 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "API/index.py" },
-    { "src": "/(.*)", "dest": "前端/dist/$1" }
+    { "src": "/api/(.*)", "dest": "api/index.py" },
+    { "src": "/(.*)", "dest": "frontend/dist/$1" }
   ]
 }
