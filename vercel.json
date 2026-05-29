@@ -1,11 +1,9 @@
 {
   "builds": [
-    // 后端配置（Python API）
     {
       "src": "API/index.py",
       "use": "@vercel/python"
     },
-    // 前端配置（Vite静态网页）
     {
       "src": "前端/package.json",
       "use": "@vercel/static-build",
@@ -15,9 +13,7 @@
     }
   ],
   "routes": [
-    // 后端接口走 /api 前缀
     { "src": "/api/(.*)", "dest": "API/index.py" },
-    // 其他所有请求都指向前端
-    { "src": "/(.*)", "dest": "/前端/$1" }
+    { "src": "/(.*)", "dest": "前端/dist/$1" }
   ]
 }
