@@ -10,7 +10,7 @@ const DEFAULT_MESSAGES = [
   },
 ]
 
-export default function Chat({ api }) {
+export default function Chat({ api, onBack }) {
   const [userAvatar, setUserAvatar] = useState(() => {
     if (typeof window === 'undefined') return null
     try {
@@ -172,6 +172,18 @@ export default function Chat({ api }) {
 
   return (
     <div className="chat-panel">
+      <div className="chat-mobile-header">
+        <button className="chat-back-btn" onClick={onBack} aria-label="返回首页">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <div className="chat-mobile-title">
+          <div className="mobile-companion-name">Elios</div>
+          <div className="mobile-companion-status">在线 · 陪你聊天</div>
+        </div>
+        <div className="chat-mobile-actions">
+          <div className={`status-dot ${serverHealthy ? 'online' : 'offline'}`} />
+        </div>
+      </div>
       <div className="chat-meta">
         <div>
           <h2>聊天空间</h2>
@@ -248,11 +260,16 @@ export default function Chat({ api }) {
           <textarea
             autoFocus
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value)
+              e.target.style.height = 'auto'
+              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
+            }}
             onKeyDown={keyDown}
             placeholder={serverHealthy ? '你想对他说什么？' : '后端未连接，无法发送'}
             disabled={loading || !serverHealthy}
-            rows={2}
+            rows={1}
+            inputMode="text"
           />
           <button className="send-btn" onClick={send} aria-label="发送消息">
             发送

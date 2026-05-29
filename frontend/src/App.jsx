@@ -58,7 +58,7 @@ export default function App() {
   }, [fetchAvatars])
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${tab === 'chat' ? 'chat-active' : ''}`}>
       <header className="app-topbar">
         <div className="brand-group">
           <div className="brand-mark">人机恋</div>
@@ -88,7 +88,7 @@ export default function App() {
       <main className="page-panel">
         <section className="page-content">
           {tab === 'home' && <Home onStart={() => setTab('chat')} />}
-          {tab === 'chat' && <Chat api={API} memoryDirty={memoryDirty} setMemoryDirty={setMemoryDirty} />}
+          {tab === 'chat' && <Chat api={API} memoryDirty={memoryDirty} setMemoryDirty={setMemoryDirty} onBack={() => setTab('home')} />}
           {tab === 'memories' && <Memories api={API} dirty={memoryDirty} />}
           {tab === 'calendar' && <CalendarView api={API} />}
           {tab === 'settings' && <Settings api={API} avatars={avatars} currentAvatar={currentAvatar} onChange={fetchAvatars} />}
