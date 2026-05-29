@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function Settings({ api, avatars, currentAvatar, onChange }) {
+export default function Settings({ api, avatars, currentAvatar, onChange, onBack }) {
   const [updating, setUpdating] = useState(false)
   const [serverStatus, setServerStatus] = useState('checking')
   const [stats, setStats] = useState(null)
@@ -68,14 +68,15 @@ export default function Settings({ api, avatars, currentAvatar, onChange }) {
   }
 
   return (
-    <div className="settings-panel">
-      <div className="settings-header">
-        <h2>设置</h2>
-        <p>个性化你的 AI 伴侣体验，让每次对话都更加温暖</p>
+    <div className="feature-panel" style={{ padding: 0 }}>
+      <div className="app-header">
+        <button className="app-back" onClick={onBack}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div className="app-title">设置</div>
+        <div className="app-header-right" />
       </div>
-
-      <div className="settings-section">
-        <h3>👤 我的头像</h3>
+      <div style={{ padding: 16, overflow: 'auto', flex: 1 }}>
+        <div className="settings-section">
+          <h3 style={{ color: 'var(--text)', fontSize: 14, fontWeight: 600, margin: '0 0 10px 4px' }}>👤 我的头像</h3>
         <div className="settings-card">
           <div className="setting-item">
             <div>
@@ -223,10 +224,11 @@ export default function Settings({ api, avatars, currentAvatar, onChange }) {
         </div>
       </div>
 
-      <div className="settings-footer">
-        <p>Elios v1.0 · 人机恋 AI 伴侣</p>
-        <p>用心倾听，温暖陪伴 💝</p>
+      <div className="settings-footer" style={{ textAlign: 'center', padding: '20px 0 8px', opacity: 0.5 }}>
+        <p style={{ fontSize: 12, marginBottom: 2 }}>Elios v1.0 · 人机恋 AI 伴侣</p>
+        <p style={{ fontSize: 11 }}>用心倾听，温暖陪伴</p>
       </div>
+    </div>
     </div>
   )
 }

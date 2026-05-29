@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function CalendarView({ api }) {
+export default function CalendarView({ api, onBack }) {
   const [events, setEvents] = useState([])
 
   useEffect(() => {
@@ -16,24 +16,30 @@ export default function CalendarView({ api }) {
   }, [])
 
   return (
-    <div className="schedule-panel">
-      <div className="schedule-header">
-        <h2>日程提醒</h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>他会帮你记住那些想要一直留住的时刻。</p>
+    <div className="feature-panel" style={{ padding: 0 }}>
+      <div className="app-header">
+        <button className="app-back" onClick={onBack}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div className="app-title">日程</div>
+        <div className="app-header-right" />
       </div>
-
-      {events.length === 0 ? (
-        <div className="schedule-empty">当前没有待办日程。你可以把重要时间托付给 Elios。</div>
-      ) : (
-        <div className="schedule-list">
-          {events.map((event, index) => (
-            <div key={event.id || index} className="schedule-card">
-              <div className="schedule-title">{event.title || event.name}</div>
-              <div className="schedule-time">{event.time || event.date || event.datetime || '未指定时间'}</div>
-            </div>
-          ))}
-        </div>
-      )}
+      <div style={{ padding: 16 }}>
+        {events.length === 0 ? (
+          <div className="feature-empty" style={{ marginTop: 40 }}>
+            <div className="feature-empty-icon">📅</div>
+            <h3>暂无日程</h3>
+            <p>告诉 Elios 你的计划</p>
+          </div>
+        ) : (
+          <div className="schedule-list">
+            {events.map((event, index) => (
+              <div key={event.id || index} className="schedule-card">
+                <div className="schedule-title">{event.title || event.name}</div>
+                <div className="schedule-time">{event.time || event.date || event.datetime || '未指定时间'}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

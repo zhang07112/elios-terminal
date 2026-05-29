@@ -9,129 +9,75 @@ import Music from './components/Music'
 import Photos from './components/Photos'
 import Mood from './components/Mood'
 import Goodnight from './components/Goodnight'
-import Settings from './components/Settings'
+import Read from './components/Read'
 import Phone from './components/Phone'
-
-const navs = [
-  {
-    id: 'home', label: '首页',
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-  },
-  {
-    id: 'chat', label: '聊天',
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
-  },
-  {
-    id: 'diary', label: '日记',
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
-  },
-  {
-    id: 'calendar', label: '日程',
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-  },
-  {
-    id: 'memories', label: '回忆',
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
-  },
-]
+import Settings from './components/Settings'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 export default function App() {
-  const [tab, setTab] = useState('home')
+  const [app, setApp] = useState('home')
   const [presence, setPresence] = useState(null)
   const [avatars, setAvatars] = useState([])
   const [currentAvatar, setCurrentAvatar] = useState(null)
   const [memoryDirty, setMemoryDirty] = useState(0)
-  const [prevTab, setPrevTab] = useState(null)
+  const [time, setTime] = useState('')
+
+  useEffect(() => {
+    const update = () => {
+      const d = new Date()
+      setTime(d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }))
+    }
+    update()
+    const i = setInterval(update, 10000)
+    return () => clearInterval(i)
+  }, [])
 
   const fetchPresence = useCallback(async () => {
-    try {
-      const r = await fetch(`${API}/cost`)
-      const d = await r.json()
-      setPresence(d)
-    } catch { setPresence(null) }
+    try { const r = await fetch(`${API}/cost`); const d = await r.json(); setPresence(d) }
+    catch { setPresence(null) }
   }, [])
 
+  useEffect(() => { fetchPresence(); const i = setInterval(fetchPresence, 10000); return () => clearInterval(i) }, [fetchPresence])
   useEffect(() => {
-    fetchPresence()
-    const interval = setInterval(fetchPresence, 10000)
-    return () => clearInterval(interval)
-  }, [fetchPresence])
-
-  const fetchAvatars = useCallback(async () => {
-    try {
-      const r = await fetch(`${API}/avatars`)
-      const d = await r.json()
-      setAvatars(d.avatars || [])
-      setCurrentAvatar(d.current || null)
-    } catch { setAvatars([]); setCurrentAvatar(null) }
+    const f = async () => {
+      try { const r = await fetch(`${API}/avatars`); const d = await r.json(); setAvatars(d.avatars || []); setCurrentAvatar(d.current || null) }
+      catch {}
+    }
+    f(); const i = setInterval(f, 30000); return () => clearInterval(i)
   }, [])
 
-  useEffect(() => {
-    fetchAvatars()
-    const interval = setInterval(fetchAvatars, 30000)
-    return () => clearInterval(interval)
-  }, [fetchAvatars])
+  const openApp = (id) => setApp(id)
 
-  const switchTab = (id) => {
-    setPrevTab(tab)
-    setTab(id)
-  }
-
-  const renderPage = () => {
-    switch (tab) {
-      case 'home': return <Home api={API} onStart={() => switchTab('chat')} onNavigate={switchTab} />
-      case 'chat': return <Chat api={API} memoryDirty={memoryDirty} setMemoryDirty={setMemoryDirty} onBack={() => switchTab('home')} />
-      case 'diary': return <Diary api={API} />
-      case 'calendar': return <CalendarView api={API} />
-      case 'memories': return <Memories api={API} dirty={memoryDirty} />
-      case 'study': return <Study api={API} />
-      case 'music': return <Music api={API} />
-      case 'photos': return <Photos api={API} />
-      case 'mood': return <Mood api={API} />
-      case 'goodnight': return <Goodnight api={API} />
-      case 'phone': return <Phone api={API} />
-      case 'settings': return <Settings api={API} avatars={avatars} currentAvatar={currentAvatar} onChange={fetchAvatars} />
-      default: return <Home api={API} onStart={() => switchTab('chat')} onNavigate={switchTab} />
+  const renderApp = () => {
+    switch (app) {
+      case 'home': return <Home onOpen={openApp} />
+      case 'chat': return <Chat api={API} onBack={() => openApp('home')} memoryDirty={memoryDirty} setMemoryDirty={setMemoryDirty} />
+      case 'diary': return <Diary api={API} onBack={() => openApp('home')} />
+      case 'calendar': return <CalendarView api={API} onBack={() => openApp('home')} />
+      case 'memories': return <Memories api={API} dirty={memoryDirty} onBack={() => openApp('home')} />
+      case 'study': return <Study api={API} onBack={() => openApp('home')} />
+      case 'music': return <Music api={API} onBack={() => openApp('home')} />
+      case 'photos': return <Photos api={API} onBack={() => openApp('home')} />
+      case 'mood': return <Mood api={API} onBack={() => openApp('home')} />
+      case 'goodnight': return <Goodnight api={API} onBack={() => openApp('home')} />
+      case 'read': return <Read api={API} onBack={() => openApp('home')} />
+      case 'phone': return <Phone api={API} onBack={() => openApp('home')} />
+      case 'settings': return <Settings api={API} onBack={() => openApp('home')} avatars={avatars} currentAvatar={currentAvatar} onChange={() => {}} />
+      default: return <Home onOpen={openApp} />
     }
   }
 
   return (
-    <div className={`app-shell ${tab === 'chat' ? 'chat-active' : ''}`}>
-      <header className="app-topbar">
-        <div className="brand-mark">人机恋</div>
-        <nav className="page-tabs">
-          {navs.map((item) => (
-            <button key={item.id} className={`tab-button ${tab === item.id ? 'active' : ''}`} onClick={() => switchTab(item.id)}>
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="topbar-actions">
-          <div className="status-pill">
-            当前资源：{presence ? `${presence.cost_this_month?.toFixed(1) ?? '—'}k` : '读取中…'}
-          </div>
-          <button className="settings-pill" onClick={() => switchTab('settings')}>设置</button>
+    <div className="phone-frame">
+      <div className="status-bar">
+        <span className="status-time">{time}</span>
+        <div className="status-icons">
+          <svg viewBox="0 0 24 24"><rect x="1" y="6" width="20" height="12" rx="3" stroke="none"/><path d="M4 10h16v4H4z" fill="rgba(255,255,255,0.3)"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" stroke="none"/></svg>
         </div>
-      </header>
-
-      <main className="page-panel">
-        <section className="page-content">
-          <div className="page-view" key={tab}>
-            {renderPage()}
-          </div>
-        </section>
-      </main>
-
-      <nav className="mobile-bottom-nav">
-        {navs.map((item) => (
-          <button key={item.id} className={`bottom-tab ${tab === item.id ? 'active' : ''}`} onClick={() => switchTab(item.id)}>
-            <span className="bottom-tab-icon">{item.icon}</span>
-            <span className="bottom-tab-label">{item.label}</span>
-          </button>
-        ))}
-      </nav>
+      </div>
+      {renderApp()}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function Memories({ api, dirty }) {
+export default function Memories({ api, dirty, onBack }) {
   const [memories, setMemories] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
@@ -25,7 +25,16 @@ export default function Memories({ api, dirty }) {
 
   if (loading) {
     return (
-      <div className="memories-panel">
+      <div className="feature-panel">
+        <div className="app-header">
+          <button className="app-back" onClick={onBack}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <div className="app-title">回忆库</div>
+          <div className="app-header-right" />
+        </div>
         <div className="memories-loading">
           <div className="loading-spinner"></div>
           <p>正在加载回忆...</p>
@@ -36,9 +45,18 @@ export default function Memories({ api, dirty }) {
 
   if (memories.length === 0) {
     return (
-      <div className="memories-panel">
-        <div className="memories-empty">
-          <div className="empty-icon">💭</div>
+      <div className="feature-panel">
+        <div className="app-header">
+          <button className="app-back" onClick={onBack}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <div className="app-title">回忆库</div>
+          <div className="app-header-right" />
+        </div>
+        <div className="feature-empty">
+          <div className="feature-empty-icon">💭</div>
           <h3>还没有回忆</h3>
           <p>开始和 Elios 聊天后<br />他会慢慢记住关于你的一切</p>
           <div className="empty-hint">
@@ -50,17 +68,26 @@ export default function Memories({ api, dirty }) {
   }
 
   return (
-    <div className="memories-panel">
-      <div className="memories-header">
-        <div className="header-content">
-          <h2>回忆库</h2>
-          <p>Elios 关于你的记忆碎片</p>
-        </div>
-        <div className="memory-stats">
-          <div className="stat-item">
-            <span className="stat-number">{memories.length}</span>
-            <span className="stat-label">条记忆</span>
-          </div>
+    <div className="feature-panel">
+      <div className="app-header">
+        <button className="app-back" onClick={onBack}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <div className="app-title">回忆库</div>
+        <div className="app-header-right" />
+      </div>
+
+      <div className="feature-header">
+        <h2>回忆库</h2>
+        <p>Elios 关于你的记忆碎片</p>
+      </div>
+
+      <div className="memory-stats">
+        <div className="stat-item">
+          <span className="stat-number">{memories.length}</span>
+          <span className="stat-label">条记忆</span>
         </div>
       </div>
 
@@ -76,9 +103,9 @@ export default function Memories({ api, dirty }) {
         ))}
       </div>
 
-      <div className="memory-list">
+      <div className="feature-card-list">
         {filteredMemories.map((memo, idx) => (
-          <article key={memo.id || idx} className="memory-card">
+          <article key={memo.id || idx} className="feature-card-item">
             <div className="memory-card-header">
               <div className="memory-category">
                 <span className="category-icon">📝</span>

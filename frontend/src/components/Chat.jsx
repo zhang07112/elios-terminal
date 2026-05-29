@@ -2,182 +2,81 @@ import { useState, useEffect, useRef } from 'react'
 import { getEnvironmentContext, formatEnvironmentContext } from '../utils/environment'
 import { fetchConversations, subscribeToConversations } from '../supabase'
 
-const DEFAULT_MESSAGES = [
-  {
-    id: 'init',
-    role: 'assistant',
-    content: '你好，我是Elios。想和我聊聊今天的心情吗？我会认真听你的每一句话。',
-  },
-]
+const DEFAULT = [{ id: 'init', role: 'assistant', content: '你好，我是Elios。想和我聊聊今天的心情吗？' }]
 
 export default function Chat({ api, onBack }) {
-  const [userAvatar, setUserAvatar] = useState(() => {
-    if (typeof window === 'undefined') return null
-    try { return window.localStorage.getItem('elios-user-avatar') } catch { return null }
-  })
-  const [msgs, setMsgs] = useState(DEFAULT_MESSAGES)
+  const [msgs, setMsgs] = useState(DEFAULT)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [serverHealthy, setServerHealthy] = useState(true)
-  const [envContext, setEnvContext] = useState(null)
-  const [locationLoading, setLocationLoading] = useState(true)
-  const bottom = useRef(null)
-  const threadRef = useRef(null)
+  const [serverOk, setServerOk] = useState(true)
+  const [env, setEnv] = useState(null)
+  const btm = useRef(null)
+  const thr = useRef(null)
 
-  const scroll = () => {
-    if (threadRef.current) {
-      threadRef.current.scrollTop = threadRef.current.scrollHeight
-      return
-    }
-    bottom.current?.scrollIntoView()
-  }
+  const scroll = () => { if (thr.current) thr.current.scrollTop = thr.current.scrollHeight; btm.current?.scrollIntoView() }
 
   useEffect(() => {
-    const loadMessages = async () => {
-      try {
-        const messages = await fetchConversations()
-        if (messages.length > 0) setMsgs(messages)
-      } catch (err) { console.warn('从 Supabase 加载消息失败', err) }
-    }
-    loadMessages()
-    const subscription = subscribeToConversations((newMsg) => setMsgs((prev) => [...prev, newMsg]))
-    return () => subscription.unsubscribe()
+    fetchConversations().then(m => { if (m.length > 0) setMsgs(m) }).catch(() => {})
+    const sub = subscribeToConversations(m => setMsgs(p => [...p, m]))
+    return () => sub.unsubscribe()
   }, [])
 
-  useEffect(() => {
-    try { window.localStorage.setItem('elios-chat-msgs', JSON.stringify(msgs)) } catch {}
-  }, [msgs])
+  useEffect(() => { try { window.localStorage.setItem('elios-chat', JSON.stringify(msgs)) } catch {} }, [msgs])
+
+  useEffect(() => { getEnvironmentContext().then(c => setEnv(c)).catch(() => {}) }, [])
 
   useEffect(() => {
-    const initEnvironment = async () => {
-      setLocationLoading(true)
-      const context = await getEnvironmentContext()
-      setEnvContext(context)
-      setLocationLoading(false)
-    }
-    initEnvironment()
-  }, [])
-
-  useEffect(() => {
-    const checkServer = async () => {
-      try {
-        const res = await fetch(`${api}/cost`)
-        if (!res.ok) throw new Error(`状态 ${res.status}`)
-        setServerHealthy(true)
-      } catch { setServerHealthy(false) }
-    }
-    checkServer()
-  }, [api])
-
-  useEffect(() => {
-    const pollProactive = async () => {
-      try {
-        const res = await fetch(`${api}/proactive-check`)
-        if (!res.ok) return
-        const data = await res.json()
-        if (data.message) setMsgs((prev) => [...prev, { id: `proactive-${Date.now()}`, role: 'assistant', content: data.message }])
-      } catch { return }
-    }
-    const interval = setInterval(pollProactive, 30000)
-    return () => clearInterval(interval)
+    fetch(`${api}/cost`).then(r => { if (r.ok) setServerOk(true) }).catch(() => setServerOk(false))
+    const i = setInterval(() => {
+      fetch(`${api}/proactive-check`).then(r => r.json()).then(d => {
+        if (d.message) setMsgs(p => [...p, { id: `p-${Date.now()}`, role: 'assistant', content: d.message }])
+      }).catch(() => {})
+    }, 30000)
+    return () => clearInterval(i)
   }, [])
 
   const send = async () => {
-    const text = input.trim()
-    if (!text || loading) return
-    setInput('')
-    setError(null)
-    setMsgs((prev) => [...prev, { role: 'user', content: text, id: Date.now() }])
-    setLoading(true)
-    const contextStr = formatEnvironmentContext(envContext)
-    const userMessageWithContext = contextStr ? `${contextStr}\n\n用户说：${text}` : text
+    const t = input.trim()
+    if (!t || loading) return
+    setInput(''); setMsgs(p => [...p, { role: 'user', content: t, id: Date.now() }]); setLoading(true)
+    const ctx = formatEnvironmentContext(env)
     try {
       const r = await fetch(`${api}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessageWithContext }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: ctx ? `${ctx}\n\n用户说：${t}` : t }),
       })
-      if (!r.ok) {
-        const t = await r.text()
-        setError(`服务器错误：${r.status} ${r.statusText}${t ? ` - ${t}` : ''}`)
-        setLoading(false)
-        return
-      }
       const d = await r.json()
-      if (d.error) { setError(d.error); setLoading(false); return }
-      setMsgs((prev) => [...prev, { role: 'assistant', content: d.reply || '他暂时没有回应，请稍后再试。', id: `r_${Date.now()}` }])
-      setLoading(false)
-    } catch (err) {
-      setError(`连接失败：${err?.message || '请确认后端是否已启动。'}`)
-      setLoading(false)
-    }
+      setMsgs(p => [...p, { role: 'assistant', content: d.reply || '...', id: `r${Date.now()}` }])
+    } catch { setMsgs(p => [...p, { role: 'assistant', content: '连接失败，稍后再试', id: `e${Date.now()}` }]) }
+    setLoading(false)
   }
 
-  const keyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
-  }
+  useEffect(() => { setTimeout(scroll, 50) }, [msgs])
 
   return (
-    <div className="chat-panel">
-      <div className="chat-mobile-header">
-        <button className="chat-back-btn" onClick={onBack} aria-label="返回">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-        </button>
-        <div className="chat-mobile-title">
-          <div className="mobile-companion-name">Elios</div>
-          <div className="mobile-companion-status">{serverHealthy ? '在线' : '离线'}</div>
-        </div>
-        <div className="chat-mobile-actions">
-          <div className={`status-dot ${serverHealthy ? 'online' : 'offline'}`} />
-        </div>
+    <div className="chat-screen">
+      <div className="app-header">
+        <button className="app-back" onClick={onBack}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div className="app-title">Elios</div>
+        <div className="app-header-right"><span className="status-dot" style={{ display: 'block', margin: '0 auto', width: 8, height: 8, borderRadius: '50%', background: serverOk ? '#34c759' : '#ff3b30' }} /></div>
       </div>
-
-      {!serverHealthy && <div className="chat-error-banner">后端未连接：请确认后端服务已启动</div>}
-
-      <div className="chat-thread imessage" ref={threadRef}>
-        {msgs.map((message) => (
-          <div key={message.id} className={`imessage-row ${message.role}`}>
-            <div className="imessage-bubble">{message.content}</div>
+      <div className="chat-thread" ref={thr}>
+        {msgs.map(m => (
+          <div key={m.id} className={`imessage-row ${m.role}`}>
+            <div className="imessage-bubble">{m.content}</div>
           </div>
         ))}
-
         {loading && (
           <div className="imessage-row assistant">
-            <div className="imessage-bubble typing">
-              <span /><span /><span />
-            </div>
+            <div className="imessage-bubble typing"><span /><span /><span /></div>
           </div>
         )}
-
-        {error && (
-          <div className="empty-state">
-            <p>{error}</p>
-            <button className="send-btn" onClick={send}>重试发送</button>
-          </div>
-        )}
-
-        <div ref={bottom} />
+        <div ref={btm} />
       </div>
-
       <div className="chat-input">
         <div className="input-wrap">
-          <textarea
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value)
-              e.target.style.height = 'auto'
-              e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'
-            }}
-            onKeyDown={keyDown}
-            placeholder="iMessage"
-            disabled={loading || !serverHealthy}
-            rows={1}
-            inputMode="text"
-          />
-          <button className="imessage-send" onClick={send} disabled={!input.trim() || loading} aria-label="发送">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          </button>
+          <textarea value={input} onChange={e => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 80) + 'px' }} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }} placeholder="iMessage" disabled={loading} rows={1} />
+          <button className="chat-send" onClick={send} disabled={!input.trim() || loading}><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
         </div>
       </div>
     </div>
