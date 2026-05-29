@@ -34,7 +34,9 @@ export default function Chat({ api, onBack }) {
   useEffect(() => { setTimeout(scrollToBottom, 50) }, [msgs, loading])
 
   const formatTime = (ts) => {
+    if (!ts) return ''
     const d = new Date(ts)
+    if (isNaN(d.getTime())) return ''
     const now = new Date()
     const isToday = d.toDateString() === now.toDateString()
     if (isToday) return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })
@@ -125,7 +127,8 @@ export default function Chat({ api, onBack }) {
         {msgs.map((m, i) => {
           const isLastAi = m.role === 'assistant' && (i === msgs.length - 1 || msgs[i + 1]?.role !== 'assistant')
           const isLastUser = m.role === 'user' && (i === msgs.length - 1 || msgs[i + 1]?.role !== 'user')
-          const showTs = (m.role === 'assistant' && isLastAi) || (m.role === 'user' && isLastUser)
+          const showTs = ((m.role === 'assistant' && isLastAi) || (m.role === 'user' && isLastUser))
+          const timeStr = formatTime(m.time)
           return (
             <div
               key={m.id}
@@ -147,7 +150,7 @@ export default function Chat({ api, onBack }) {
               <div className={`message-bubble ${m.role === 'assistant' ? 'ai' : 'user'}`}>
                 <div className="content">{m.content}</div>
               </div>
-              {showTs && <div className="timestamp">{formatTime(m.time)}</div>}
+              {showTs && timeStr && <div className="timestamp">{timeStr}</div>}
             </div>
           )
         })}
