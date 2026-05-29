@@ -1,6 +1,4 @@
-import asyncio
-import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 
 from openai import OpenAI
@@ -40,11 +38,6 @@ class ProactiveEngine:
         self.last_message: Optional[datetime] = None
         self.pending_message: Optional[str] = None
 
-    def load_character(self) -> str:
-        if CHARACTER_FILE.exists():
-            return CHARACTER_FILE.read_text(encoding="utf-8")[:500]
-        return ""
-
     def check(self) -> Optional[str]:
         if not self.client:
             return None
@@ -68,7 +61,7 @@ class ProactiveEngine:
 
         if last_assistant:
             try:
-                last_time = datetime.fromisoformat(last_assistant)
+                last_time = datetime.fromisoformat(last_assistant.replace("Z", "+00:00").split(".")[0])
                 if (now - last_time).total_seconds() < MIN_GAP:
                     return None
             except (ValueError, TypeError):
@@ -80,7 +73,7 @@ class ProactiveEngine:
             resp = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": f"{self.load_character()}\n\n{PROACTIVE_PROMPT}"},
+                    {"role": "system", "content": f"{self._load_character()}\n\n{PROACTIVE_PROMPT}"},
                     {"role": "user", "content": "最近对话：\n" + str(
                         [{"role": m["role"], "content": m["content"][:200]} for m in recent[-10:]]
                     )},
@@ -104,3 +97,8 @@ class ProactiveEngine:
         msg = self.pending_message
         self.pending_message = None
         return msg
+
+    def _load_character(self) -> str:
+        if CHARACTER_FILE.exists():
+            return CHARACTER_FILE.read_text(encoding="utf-8")[:500]
+        return ""

@@ -1,21 +1,18 @@
 import json
 from datetime import datetime, date
 from typing import List, Dict, Optional
-from pathlib import Path
 
 from openai import OpenAI
 
-from .config import (
-    DATA_DIR,
-    DEEPSEEK_API_KEY,
-    OPENAI_BASE_URL,
-    OPENAI_MODEL,
-)
+from .config import DEEPSEEK_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL
 from .memory import load_conversations, get_recent_context
-
-MEMORY_CARDS_FILE = DATA_DIR / "memory_cards.json"
-DIARY_DIR = DATA_DIR / "diaries"
-SUMMARY_FILE = DATA_DIR / "today_summary.json"
+from .supabase_client import (
+    get_memory_cards_sync,
+    replace_all_memory_cards_sync,
+    get_daily_summary_sync,
+    save_daily_summary_sync,
+    save_diary_sync,
+)
 
 SUMMARY_INTERVAL = 5
 
@@ -47,46 +44,28 @@ DREAM_PROMPT = """你刚刚回顾了今天和 Cici 的对话。请以 Elios 的�
 [卡片 JSON 数组]"""
 
 
-def ensure_dirs():
-    DIARY_DIR.mkdir(parents=True, exist_ok=True)
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-
 def load_memory_cards() -> List[Dict]:
-    if MEMORY_CARDS_FILE.exists():
-        try:
-            with open(MEMORY_CARDS_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, Exception):
-            return []
-    return []
+    try:
+        rows = get_memory_cards_sync(limit=1000)
+        results = []
+        for r in rows:
+            tags = r.get("tags") or []
+            results.append({
+                "topic": r.get("title", ""),
+                "content": r.get("content", ""),
+                "keywords": tags if isinstance(tags, list) else [],
+                "created": r.get("created_at", ""),
+            })
+        return results
+    except Exception:
+        return []
 
 
 def save_memory_cards(cards: List[Dict]):
-    with open(MEMORY_CARDS_FILE, "w", encoding="utf-8") as f:
-        json.dump(cards, f, ensure_ascii=False, indent=2)
-
-
-def load_today_summary() -> str:
-    today = date.today().isoformat()
-    if SUMMARY_FILE.exists():
-        try:
-            data = json.loads(SUMMARY_FILE.read_text(encoding="utf-8"))
-            if data.get("date") == today:
-                return data.get("summary", "")
-        except (json.JSONDecodeError, Exception):
-            pass
-    return ""
-
-
-def save_today_summary(summary: str):
-    with open(SUMMARY_FILE, "w", encoding="utf-8") as f:
-        json.dump(
-            {"date": date.today().isoformat(), "summary": summary},
-            f,
-            ensure_ascii=False,
-            indent=2,
-        )
+    try:
+        replace_all_memory_cards_sync(cards)
+    except Exception:
+        pass
 
 
 def get_relevant_cards(new_message: str, max_cards: int = 3) -> List[Dict]:
@@ -122,7 +101,6 @@ class MemoryEngine:
         ) if DEEPSEEK_API_KEY else None
         self.model = OPENAI_MODEL
         self.message_count = 0
-        ensure_dirs()
 
     def generate_summary(self) -> str:
         if not self.client:
@@ -144,7 +122,10 @@ class MemoryEngine:
                 max_tokens=500,
             )
             summary = resp.choices[0].message.content.strip()
-            save_today_summary(summary)
+            try:
+                save_daily_summary_sync(date.today().isoformat(), summary)
+            except Exception:
+                pass
             return summary
         except Exception:
             return ""
@@ -217,10 +198,11 @@ class MemoryEngine:
 
             diary_text = diary_part.strip()
             today = date.today().isoformat()
-            diary_file = DIARY_DIR / f"{today}.md"
-            diary_file.write_text(
-                f"# {today} 的日记\n\n{diary_text}\n", encoding="utf-8"
-            )
+
+            try:
+                save_diary_sync(today, diary_text)
+            except Exception:
+                pass
 
             try:
                 cards_part = cards_part.replace("```json", "").replace("```", "").strip()

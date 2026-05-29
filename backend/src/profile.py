@@ -1,20 +1,8 @@
 import json
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional
-from .config import DATA_DIR
+from typing import Dict, List
 
-PROFILE_FILE = DATA_DIR / "cici_profile.json"
-
-
-def load_profile() -> Dict:
-    if PROFILE_FILE.exists():
-        try:
-            with open(PROFILE_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, Exception):
-            return _default_profile()
-    return _default_profile()
+from .supabase_client import get_elios_profile_sync, save_elios_profile_sync
 
 
 def _default_profile() -> Dict:
@@ -40,10 +28,22 @@ def _default_profile() -> Dict:
     }
 
 
+def load_profile() -> Dict:
+    try:
+        row = get_elios_profile_sync()
+        if row and row.get("profile_data"):
+            return row["profile_data"]
+    except Exception:
+        pass
+    return _default_profile()
+
+
 def save_profile(profile: Dict):
     profile["last_updated"] = datetime.now().isoformat()
-    with open(PROFILE_FILE, "w", encoding="utf-8") as f:
-        json.dump(profile, f, ensure_ascii=False, indent=2)
+    try:
+        save_elios_profile_sync({"profile_data": profile})
+    except Exception:
+        pass
 
 
 def profile_to_prompt(profile: Dict) -> str:

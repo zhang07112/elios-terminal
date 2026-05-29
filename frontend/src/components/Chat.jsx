@@ -93,13 +93,12 @@ export default function Chat({ api }) {
   }, [api])
 
   useEffect(() => {
-    const wsUrl = api.replace(/^http/, 'ws')
-    const ws = new WebSocket(`${wsUrl}/ws`)
-
-    ws.onmessage = (event) => {
+    const pollProactive = async () => {
       try {
-        const data = JSON.parse(event.data)
-        if (data.type === 'proactive' && data.message) {
+        const res = await fetch(`${api}/proactive-check`)
+        if (!res.ok) return
+        const data = await res.json()
+        if (data.message) {
           setMsgs((prev) => [
             ...prev,
             {
@@ -114,12 +113,8 @@ export default function Chat({ api }) {
       }
     }
 
-    ws.onerror = () => {}
-    ws.onclose = () => {}
-
-    return () => {
-      ws.close()
-    }
+    const interval = setInterval(pollProactive, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   const send = async () => {

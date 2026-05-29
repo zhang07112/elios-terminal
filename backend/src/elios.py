@@ -1,13 +1,12 @@
 import sys
 import json
 from datetime import datetime
-from pathlib import Path
 from typing import List, Dict, Optional
 
 from openai import OpenAI
 
-from .config import DEEPSEEK_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL, CHARACTER_FILE, DATA_DIR
-from .memory import load_conversations, append_message, get_recent_context
+from .config import DEEPSEEK_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL, CHARACTER_FILE
+from .memory import load_conversations, get_recent_context
 from .profile import (
     load_profile,
     save_profile,
@@ -15,9 +14,7 @@ from .profile import (
     append_observation,
     merge_reflection,
 )
-
-COST_LOG = DATA_DIR / "cost_log.json"
-
+from .supabase_client import save_cost_log_sync, get_cost_logs_sync
 
 REFLECTION_INTERVAL = 8
 
@@ -70,7 +67,6 @@ class EliosEngine:
         if profile_section:
             parts.append("\n\n---\n\n" + profile_section)
 
-        from datetime import datetime
         now = datetime.now()
         time_context = (
             f"\n\n【当前时间】{now.strftime('%Y年%m月%d日 %A %H:%M')}"
@@ -121,8 +117,6 @@ class EliosEngine:
             )
             result = response.choices[0].message.content.strip()
 
-            import json
-
             result = result.replace("```json", "").replace("```", "").strip()
             reflection = json.loads(result)
 
@@ -151,11 +145,6 @@ class EliosEngine:
             if usage:
                 self._log_cost(active_model, usage.prompt_tokens, usage.completion_tokens)
 
-            all_msgs = load_conversations()
-            append_message("user", user_input, all_msgs)
-            all_msgs = load_conversations()
-            append_message("assistant", reply, all_msgs)
-
             if self.conversation_count % REFLECTION_INTERVAL == 0:
                 self._reflect()
 
@@ -166,32 +155,18 @@ class EliosEngine:
 
     def _log_cost(self, model: str, prompt_tokens: int, completion_tokens: int):
         try:
-            costs = []
-            if COST_LOG.exists():
-                costs = json.loads(COST_LOG.read_text(encoding="utf-8"))
-            costs.append({
-                "model": model,
-                "prompt_tokens": prompt_tokens,
-                "completion_tokens": completion_tokens,
-                "total_tokens": prompt_tokens + completion_tokens,
-                "timestamp": datetime.now().isoformat(),
-            })
-            if len(costs) > 1000:
-                costs = costs[-1000:]
-            COST_LOG.write_text(json.dumps(costs, ensure_ascii=False, indent=2), encoding="utf-8")
+            save_cost_log_sync(model, prompt_tokens, completion_tokens)
         except Exception:
             pass
 
     def get_cost_summary(self) -> str:
         try:
-            if not COST_LOG.exists():
-                return "暂无费用记录"
-            costs = json.loads(COST_LOG.read_text(encoding="utf-8"))
-            total_tokens = sum(c["total_tokens"] for c in costs)
+            costs = get_cost_logs_sync(limit=1000)
+            total_tokens = sum(c.get("tokens_used", 0) for c in costs)
             total_calls = len(costs)
             today_tokens = sum(
-                c["total_tokens"] for c in costs
-                if c.get("timestamp", "").startswith(datetime.now().strftime("%Y-%m-%d"))
+                c.get("tokens_used", 0) for c in costs
+                if c.get("created_at", "").startswith(datetime.now().strftime("%Y-%m-%d"))
             )
             return f"总调用 {total_calls} 次 | 总消耗 {total_tokens} tokens | 今日 {today_tokens} tokens"
         except Exception:

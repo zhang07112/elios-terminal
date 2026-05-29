@@ -1,46 +1,20 @@
-import json
-from datetime import datetime, date
-from pathlib import Path
 from typing import List, Dict
-from .config import MEMORY_DIR
-
-CONVERSATION_FILE = MEMORY_DIR / "conversations.json"
-SUMMARY_FILE = MEMORY_DIR / "today_summary.json"
+from .supabase_client import get_conversations_sync
 
 
 def load_conversations() -> List[Dict]:
-    if CONVERSATION_FILE.exists():
-        with open(CONVERSATION_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
-
-def save_conversations(messages: List[Dict]):
-    with open(CONVERSATION_FILE, "w", encoding="utf-8") as f:
-        json.dump(messages, f, ensure_ascii=False, indent=2)
-
-
-def append_message(role: str, content: str, messages: List[Dict]):
-    now = datetime.now().isoformat()
-    entry = {"role": role, "content": content, "timestamp": now}
-    messages.append(entry)
-    save_conversations(messages)
-
-
-def load_today_summary() -> str:
-    today = date.today().isoformat()
-    if SUMMARY_FILE.exists():
-        data = json.loads(SUMMARY_FILE.read_text(encoding="utf-8"))
-        if data.get("date") == today:
-            return data.get("summary", "")
-    return ""
-
-
-def save_today_summary(summary: str):
-    data = {"date": date.today().isoformat(), "summary": summary}
-    SUMMARY_FILE.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    try:
+        convs = get_conversations_sync(limit=1000, ascending=True)
+        return [
+            {
+                "role": c["role"],
+                "content": c["content"],
+                "timestamp": c.get("created_at", ""),
+            }
+            for c in convs
+        ]
+    except Exception:
+        return []
 
 
 def get_recent_context(messages: List[Dict], max_turns: int = 20) -> List[Dict]:

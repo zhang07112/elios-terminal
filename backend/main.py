@@ -1,13 +1,9 @@
 import sys
 import os
-import asyncio
-import json
-from contextlib import asynccontextmanager
-from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -23,17 +19,7 @@ elios = EliosEngine()
 memory = MemoryEngine()
 proactive = ProactiveEngine()
 
-connected_websockets = set()
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    task = asyncio.create_task(proactive_loop())
-    yield
-    task.cancel()
-
-
-app = FastAPI(title="Elios API", lifespan=lifespan)
+app = FastAPI(title="Elios API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,21 +28,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-async def proactive_loop():
-    while True:
-        await asyncio.sleep(30)
-        try:
-            msg = proactive.check()
-            if msg:
-                for ws in connected_websockets.copy():
-                    try:
-                        await ws.send_json({"type": "proactive", "message": msg})
-                    except Exception:
-                        connected_websockets.discard(ws)
-        except Exception:
-            pass
 
 
 class ChatRequest(BaseModel):
@@ -73,13 +44,19 @@ def root():
     return {"status": "ok", "elios": "online"}
 
 
-@app.post("/chat", response_model=ChatResponse)
+@app.get("/api/proactive-check")
+def proactive_check():
+    msg = proactive.check()
+    return {"message": msg}
+
+
+@app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     try:
         save_conversation_sync("user", req.message)
     except Exception as e:
         print(f"Failed to save conversation: {e}")
-    
+
     tool_results = check_message_for_tools(req.message)
     tool_context = tools_to_context(tool_results)
 
@@ -94,7 +71,7 @@ def chat(req: ChatRequest):
 
     model = req.model if req.model else None
     reply = elios.chat(combined, model_override=model)
-    
+
     try:
         save_conversation_sync("assistant", reply or "")
     except Exception as e:
@@ -103,7 +80,7 @@ def chat(req: ChatRequest):
     return ChatResponse(reply=reply or "")
 
 
-@app.get("/profile")
+@app.get("/api/profile")
 def profile():
     try:
         supabase_profile = get_profile_sync()
@@ -114,7 +91,7 @@ def profile():
     return {"profile": elios.get_profile_summary()}
 
 
-@app.get("/messages")
+@app.get("/api/messages")
 def messages(limit: int = 100):
     try:
         return {"messages": get_conversations_sync(limit)}
@@ -123,20 +100,27 @@ def messages(limit: int = 100):
         return {"messages": []}
 
 
-@app.get("/cards")
+@app.get("/api/cards")
 def cards():
     return {"cards": load_memory_cards()}
 
 
-@app.post("/dream")
+@app.post("/api/dream")
 def dream():
     diary = memory.dream()
     cards = load_memory_cards()
     return {"diary": diary or "今天还没什么可写的", "cards": cards}
 
 
-@app.post("/schedule")
-def schedule(title: str = "", date: str = "", note: str = ""):
+@app.get("/api/schedule")
+def get_schedule():
+    today = [{"title": e["title"], "date": e.get("date", "")} for e in get_today_events()]
+    upcoming = [{"title": e["title"], "date": e.get("date", "")} for e in get_upcoming_events(7)]
+    return {"events": today + upcoming, "today": today, "upcoming": upcoming}
+
+
+@app.post("/api/schedule")
+def add_schedule(title: str = "", date: str = "", note: str = ""):
     if title:
         add_event(title, date, note)
     return {
@@ -145,34 +129,18 @@ def schedule(title: str = "", date: str = "", note: str = ""):
     }
 
 
-@app.post("/health")
+@app.post("/api/health")
 def health(record_type: str = "", value: str = "", note: str = ""):
     if record_type:
         add_health_record(record_type, value, note)
-    return {"records": [{"type": r["type"], "value": r["value"]} for r in get_latest_health()]}
+    return {"records": [{"type": r["record_type"], "value": r["value"]} for r in get_latest_health()]}
 
 
-@app.get("/models")
+@app.get("/api/models")
 def models():
     return {"models": ["deepseek-chat", "gpt-4o-mini", "gpt-4o"], "current": OPENAI_MODEL}
 
 
-@app.get("/cost")
+@app.get("/api/cost")
 def cost():
     return {"cost": elios.get_cost_summary()}
-
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    connected_websockets.add(websocket)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            msg = json.loads(data)
-            if msg.get("type") == "ping":
-                await websocket.send_json({"type": "pong"})
-    except WebSocketDisconnect:
-        connected_websockets.discard(websocket)
-    except Exception:
-        connected_websockets.discard(websocket)

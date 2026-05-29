@@ -14,7 +14,7 @@ const navs = [
   { id: 'phone', label: '语音' },
 ]
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 export default function App() {
   const [tab, setTab] = useState('home')
